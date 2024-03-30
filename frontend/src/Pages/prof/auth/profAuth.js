@@ -5,13 +5,13 @@ import Proflogin from './loginComponent.js';
 
 const ProfAuth = () => {
     return (
-        <div className='h-screen bg-gray-200'>
-            <div className='h-[20%]'>
+        <div className='h-[100vh] w-full bg-gray-200 overflow-y-hidden'>
+            <div className='w-full h-[20vh]'>
                 <Header />
             </div>
-            <div className='h-[80%]'>
+            <div className='w-full h-[80vh]'>
                 <Link to={`/`}>
-                    <i className="fa-sharp fa-solid fa-arrow-left mx-2 md:mx-4 mt-3 md:mt-5 text-2xl md:text-3xl p-2"/>
+                    <i className="fa-sharp fa-solid fa-arrow-left text-blue-700 mx-2 md:mx-4 text-2xl md:text-3xl p-2"/>
                 </Link>
                 <Proflogin />
             </div>
