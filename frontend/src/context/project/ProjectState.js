@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from 'react-redux';
-import { setSpecificProjects, setAllProjects, delProject, addProject, setInterestedStudents } from "../../Redux/allProjects/allprojectsSlice";
+import { setSpecificProjects, setAllProjectsRedux, delProject, addProject, setInterestedStudents } from "../../Redux/allProjects/allprojectsSlice";
 import { setAllStudents } from "../../Redux/student/studentSlice"
 import ItemContext from "./ProjectContext";
 var _ = require('lodash');
@@ -8,7 +8,7 @@ var _ = require('lodash');
 
 const ItemState=(props)=>{
 
-    const [items,setItems]=useState([]);
+    const [allProjectsState,setAllProjectsState]=useState([]);
     const [itemsspecific,setItemsspecific]=useState([]);
     const [details,setDetails]=useState([]);
     const [single,setSingle]=useState([]);
@@ -31,24 +31,19 @@ const ItemState=(props)=>{
             }
         });
         const json=await response.json();
+
+        //reverse the array to get the latest project at top
         json.reverse();
 
-        //capitalize the content in a project
-        json.map((value)=>{if(value)value.title=_(value.title).capitalize()})
-        json.map((value)=>{if(value)value.co_supervisor=_(value.co_supervisor).capitalize()})
-        json.map((value)=>{if(value)value.brief_abstract=_(value.brief_abstract).capitalize()})
-        json.map((value)=>{if(value)value.specialization=_(value.specialization).capitalize()})
-
-        //save details in react redux
-        setItems(json);
-        dispatch(setAllProjects(json));
+        //save details in react state and redux
+        setAllProjectsState(json);
+        dispatch(setAllProjectsRedux(json));
 
         return response.status;
     };
 
 
-    
-    const Projectspecific=async()=>{  
+    const Projectspecific = async () => {  
         const response = await fetch(`${url}/project/projectsposted`, {
             method: 'GET',
             headers: {
@@ -57,11 +52,8 @@ const ItemState=(props)=>{
             }
         })
 
-        const json=await (response.json())        
-        json.map((value)=>{if(value)value.title=_(value.title).capitalize()})
-        json.map((value)=>{if(value)value.co_supervisor=_(value.co_supervisor).capitalize()})
-        json.map((value)=>{if(value)value.brief_abstract=_(value.brief_abstract).capitalize()})
-        json.map((value)=>{if(value)value.specialization=_(value.specialization).capitalize()})
+        const json=await (response.json())  
+        
         json.reverse();
         if(json)
         setItemsspecific(json);       
@@ -234,7 +226,7 @@ const ItemState=(props)=>{
     
         
     return (
-        <ItemContext.Provider value={{details,logout,getAllStudent,allProjects,createStudent,items,createProject,updateProject,deleteProject,selectproject,deselectproject,ownerdetails,Projectspecific,itemsspecific,getSingleProject,single, getInterestedStudents,allotProject,checkRegisteredFunc}}>
+        <ItemContext.Provider value={{details,logout,getAllStudent,allProjects,createStudent,allProjectsState,createProject,updateProject,deleteProject,selectproject,deselectproject,ownerdetails,Projectspecific,itemsspecific,getSingleProject,single, getInterestedStudents,allotProject,checkRegisteredFunc}}>
             {props.children}
         </ItemContext.Provider>
     )

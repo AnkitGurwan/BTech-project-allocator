@@ -15,6 +15,17 @@ const AuthState = (props) => {
     // const url = process.env.REACT_APP_BACKEND_URL;
 
 
+    //prof login
+    const ProfMicrosoftLogin = async()=>{
+        window.location.href = `${process.env.REACT_APP_BACKEND_URL}/auth/microsoft/prof`;
+    }
+
+    //student login
+    const StudentMicrosoftLogin = async()=>{
+        window.location.href = `${process.env.REACT_APP_BACKEND_URL}/auth/microsoft/student`;
+    }
+
+    
     //send feedback both student and professor
     const sendFeedback = async (email, header, body)=>{
         const response = await fetch(`${url}/btp/feedback`, {
@@ -74,11 +85,6 @@ const AuthState = (props) => {
             }
         })
         return response.status;
-        }
-
-
-    const MicrosoftLogin = async()=>{
-        window.location.href = `${process.env.REACT_APP_BACKEND_URL}/auth/microsoft`;
     }
 
 
@@ -102,7 +108,7 @@ const AuthState = (props) => {
     }
     
 
-    return (<AuthContext.Provider value={{sendFeedback, MicrosoftLogin, ownerdetails, user, downloadDetails, interest, projectdetails, getUserDetailsFromMicrosoft}}>
+    return (<AuthContext.Provider value={{sendFeedback, ProfMicrosoftLogin, StudentMicrosoftLogin, ownerdetails, user, downloadDetails, interest, projectdetails, getUserDetailsFromMicrosoft}}>
         {props.children}
     </AuthContext.Provider>
     )

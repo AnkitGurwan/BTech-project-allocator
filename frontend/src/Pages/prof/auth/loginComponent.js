@@ -2,10 +2,10 @@ import React, { useContext } from 'react';
 import AuthContext from '../../../context/auth/AuthContext';
 
 const Body2 = () => {
-    const { MicrosoftLogin } = useContext(AuthContext);
+    const { ProfMicrosoftLogin } = useContext(AuthContext);
 
     const clickHandler = async () => {
-        await MicrosoftLogin();
+        await ProfMicrosoftLogin();
     };
 
 

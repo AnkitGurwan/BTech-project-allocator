@@ -2,10 +2,10 @@ import React, { useContext } from 'react';
 import AuthContext from '../../../context/auth/AuthContext';
 
 const StudentAuth = () => {
-    const { MicrosoftLogin } = useContext(AuthContext);
+    const { StudentMicrosoftLogin } = useContext(AuthContext);
 
     const clickHandler = async () => {
-        await MicrosoftLogin();
+        await StudentMicrosoftLogin();
     };
 
     return (

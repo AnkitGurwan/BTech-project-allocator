@@ -12,7 +12,7 @@ const allprojectsSlice = createSlice({
     name:"allProjects",
     initialState,
     reducers:{
-        setAllProjects(state,action){
+        setAllProjectsRedux(state,action){
             return {
                 ...state,
                 allProjects: action.payload
@@ -37,19 +37,10 @@ const allprojectsSlice = createSlice({
         delProject(state,action){
             const index = state.specificProjects.findIndex(item => item.id === action.payload);
             state.specificProjects.slice(index, 1);
-        }, 
-        // editProject(state,action)
-        // {
-        //     const index = state.allProjects.findIndex(item => item.id === action.payload);
-        //     console.log(state.allProjects[index].interestedPeople)
-        //     return {
-        //         ...state,
-        //         allProjects: action.payload
-        //       };
-        // }
+        }
     }
 })
-export const {setAllProjects,setSpecificProjects,addProject,delProject,editProject,setInterestedStudents} = allprojectsSlice.actions;
+export const {setAllProjectsRedux, setSpecificProjects, addProject, delProject, editProject, setInterestedStudents} = allprojectsSlice.actions;
 
 export default allprojectsSlice.reducer;
 

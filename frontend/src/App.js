@@ -10,6 +10,7 @@ import ItemState from './context/project/ProjectState.js';
 import Interface from './Pages/interface.js';
 import Proflogin from './Pages/prof/auth/profAuth.js';
 import Studentlogin from './Pages/student/auth/studentAuth.js';
+import StudentHome from './Pages/student/projects/allProjects.js'
 
 const App = () => {
   return (
@@ -21,10 +22,16 @@ const App = () => {
                     <Route path='/' element={<Interface/>}/>
 
                     {/* prof login page */}
-                    <Route path='/proflogin' element={<Proflogin/>}/>
+                    <Route path='/prof' element={<Proflogin/>}/>
 
                     {/* student login page */}
-                    <Route path='/studentlogin' element={<Studentlogin/>}/>
+                    <Route path='/student' element={<Studentlogin/>}/>
+
+                    {/* prof home page */}
+                    <Route path='/prof/projects' element={<Proflogin/>}/>
+
+                    {/* student home page */}
+                    <Route path='/student/projects' element={<StudentHome/>}/>
                 </Routes>
             </BrowserRouter>
         </ItemState>

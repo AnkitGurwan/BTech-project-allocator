@@ -1,5 +1,7 @@
+import dotenv from "dotenv";
+dotenv.config({path:"config/.env"});
+
 import msal from '@azure/msal-node';
-import request from 'request';
 import fetch from "node-fetch"
 
 const clientID = process.env.MICROSOFT_GRAPH_CLIENT_ID;
@@ -9,9 +11,8 @@ const clientSecret = process.env.MICROSOFT_GRAPH_CLIENT_SECRET;
 const config = {
   auth: {
     clientId: clientID,
-    authority: "https://login.microsoftonline.com/"+tenantID,
-    clientSecret: clientSecret,
-    redirectUri: `${process.env.FRONTENDURL}/studentallproject`,
+    authority: "https://login.microsoftonline.com/" + tenantID,
+    clientSecret: clientSecret
   },
   system: {
     loggerOptions: {
@@ -26,10 +27,23 @@ const config = {
 const pca = new msal.PublicClientApplication(config);
 
 
-export const login = async (req, res) => {
+//microsoft prof login
+export const profLogin = async (req, res) => {
   const authCodeUrlParameters = {
     scopes: ['user.read'],
-    redirectUri: `${process.env.FRONTENDURL}/studentallproject`,
+    redirectUri: `${process.env.FRONTENDURL}/prof/projects`,
+  };
+
+  const authUrl = await pca.getAuthCodeUrl(authCodeUrlParameters);
+
+  res.redirect(authUrl);
+};
+
+//microsoft student login
+export const studentLogin = async (req, res) => {
+  const authCodeUrlParameters = {
+    scopes: ['user.read'],
+    redirectUri: `${process.env.FRONTENDURL}/student/projects`,
   };
 
   const authUrl = await pca.getAuthCodeUrl(authCodeUrlParameters);
@@ -77,8 +91,7 @@ export const getToken = async (req,res) => {
     
     if (response2.ok) {
       const data = await response2.json();
-      
-
+      console.log("stud",data)
       res.status(200).json({ studInformation: data , accessToken });
     } else {
       throw new Error(await response2.text());
