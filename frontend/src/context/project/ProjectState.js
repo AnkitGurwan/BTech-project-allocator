@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setSpecificProjects, setAllProjects, delProject, addProject, setInterestedStudents } from "../../Redux/allProjects/allprojectsSlice";
 import { setAllStudents } from "../../Redux/student/studentSlice"
 import ItemContext from "./ProjectContext";
@@ -12,11 +12,14 @@ const ItemState=(props)=>{
     const [itemsspecific,setItemsspecific]=useState([]);
     const [details,setDetails]=useState([]);
     const [single,setSingle]=useState([]);
-    const projectsAll = useSelector(state => state.allProjects.specificProjects);
 
-    // const url = process.env.REACT_APP_BACKEND_URL;
-    const url = 'http://localhost:5000';
     const dispatch = useDispatch();
+
+    //local backend url for testing
+    const url = 'http://localhost:5000';
+
+    //hosted backend url
+    // const url = process.env.REACT_APP_BACKEND_URL;
 
     
     const allProjects = async () => {
@@ -29,16 +32,22 @@ const ItemState=(props)=>{
         });
         const json=await response.json();
         json.reverse();
+
+        //capitalize the content in a project
         json.map((value)=>{if(value)value.title=_(value.title).capitalize()})
         json.map((value)=>{if(value)value.co_supervisor=_(value.co_supervisor).capitalize()})
         json.map((value)=>{if(value)value.brief_abstract=_(value.brief_abstract).capitalize()})
         json.map((value)=>{if(value)value.specialization=_(value.specialization).capitalize()})
-        setItems(json);
 
+        //save details in react redux
+        setItems(json);
         dispatch(setAllProjects(json));
+
         return response.status;
     };
 
+
+    
     const Projectspecific=async()=>{  
         const response = await fetch(`${url}/project/projectsposted`, {
             method: 'GET',

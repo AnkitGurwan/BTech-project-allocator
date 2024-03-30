@@ -15,18 +15,6 @@ const AuthState = (props) => {
     // const url = process.env.REACT_APP_BACKEND_URL;
 
 
-    //student login through microsoft
-    const loginStudent = async ()=>{
-        const response = await fetch(`${url}/microsoft/auth/login`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
-        return response.status;
-    }
-
-
     //send feedback both student and professor
     const sendFeedback = async (email, header, body)=>{
         const response = await fetch(`${url}/btp/feedback`, {
@@ -68,11 +56,15 @@ const AuthState = (props) => {
             }
         })
         const json=await response.json();
+
+        // save particular project in react-redux 
         setInterest(json);
+
         return response.status;
-        }
+    }
 
 
+    //dowload complete list of registered students
     const downloadDetails = async(email)=>{
         const response = await fetch(`${url}/project/intrestedpeople/${email}`, {
             method: 'GET',
@@ -81,17 +73,17 @@ const AuthState = (props) => {
                 'Accept': 'application/json'
             }
         })
-
-        const json=await response.json();
         return response.status;
         }
 
-      const studentDetails = async()=>{
+
+    const MicrosoftLogin = async()=>{
         window.location.href = `${process.env.REACT_APP_BACKEND_URL}/auth/microsoft`;
     }
 
-      const getToken = async(code)=>{
-        const response = await fetch(`${url}/auth/microsoft/getToken`, {
+
+    const getUserDetailsFromMicrosoft = async (code) => {
+        const response = await fetch(`${url}/auth/microsoft/getUserDetailsFromMicrosoft`, {
             method: 'GET',
             headers: {
                 'Content-Type': "application/json",
@@ -100,16 +92,17 @@ const AuthState = (props) => {
         });
 
         const json=await response.json();
+
+        //save user details in local storage
         localStorage.setItem('studName',json.studInformation.givenName);
         localStorage.setItem('studId',json.studInformation.mail);
         localStorage.setItem('studRoll',json.studInformation.surname);
         localStorage.setItem('studJob',json.studInformation.jobTitle);
-        console.log("json",json)
         localStorage.setItem('accessToken',json.accessToken);
     }
     
 
-    return (<AuthContext.Provider value={{sendFeedback, loginStudent, ownerdetails, user, downloadDetails, interest, projectdetails,  studentDetails, getToken}}>
+    return (<AuthContext.Provider value={{sendFeedback, MicrosoftLogin, ownerdetails, user, downloadDetails, interest, projectdetails, getUserDetailsFromMicrosoft}}>
         {props.children}
     </AuthContext.Provider>
     )
