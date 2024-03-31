@@ -14,17 +14,16 @@ const MainPagesHeader = () => {
         
     return(
         <div 
-            className='w-full bg-blue-700 text-white flex justify-between items-center py-1 md:px-6'
-            style={{'backgroundColor':'#10A19D'}}
+            className='w-full bg-gray-800 text-white flex justify-between items-center py-1 md:px-6'
         >
-            <div class="navbar-brand float-left flex items-center">
+            <div class="flex items-center">
               <img 
                 class="h-10 md:h-16 w-10 md:w-16" 
                 src="https://iitg.ac.in/mech/static/images/logo.png" 
                 alt='iitg logo'
             />
                 <span className='md:flex'>
-                    <div className='text-xs md:text-2xl md:ml-8 font-medium md:font-semibold'>
+                    <div className='text-xs md:text-2xl md:ml-6 font-medium md:font-semibold'>
                         Indian Institute of Technology,
                     </div>
                     <div className='text-xs md:text-2xl md:ml-2 font-medium md:font-semibold'>

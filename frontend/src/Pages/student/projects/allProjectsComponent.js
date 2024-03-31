@@ -5,22 +5,34 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
 import ProjectContext from '../../../context/project/ProjectContext';
+import StudentContext from '../../../context/student/StudentContext'
 import Projectcard from './Projectcard';
 import AuthContext from '../../../context/auth/AuthContext';
+import CourseStructure from './courseStructure.js';
 
 const AllProjectsComponent = () => {
 
     const [searchParams, setSearchParams] = useSearchParams();
-    const { allProjects, getAllStudent, createStudent, checkStudentRegistered, logout } = useContext(ProjectContext);
 
-    const { getToken, StudentMicrosoftLogin } = useContext(AuthContext);
-    const students = useSelector((state) => state.student.allStudents);
+    //context apis
+    const { allProjects, logout } = useContext(ProjectContext);
+    const { getUserDetailsFromMicrosoft, StudentMicrosoftLogin } = useContext(AuthContext);
+    const { createStudent, checkStudentAlloted } = useContext(StudentContext);
+    
+    //react states
     const [mobileMenu, setMobileMenu] = useState(false);
     const [allowed, setAllowed] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [registered, setRegistered] = useState(false);
     const [projectId,setProjectId] = useState('');
-    var items = useSelector((state) => state.allProjects.allProjects);
+    const [partner, setPartner] = useState('');
+    const [flag, setFlag] = useState(false);
+
+
+    //get details from redux store
+    const items = useSelector((state) => state.allProjects.allProjects);
+    const students = useSelector((state) => state.student.allStudents);
+
 
     //check student allowed or not to access the page
     const checkStudentAllowed = () => {
@@ -32,7 +44,8 @@ const AllProjectsComponent = () => {
             ) {
                 setAllowed(true);
                 setLoading(false);
-            } else {
+            } 
+            else {
                 setLoading(false);
                 setAllowed(false);
             }
@@ -44,22 +57,30 @@ const AllProjectsComponent = () => {
         }
     };
 
-    
+
     //get access token
     const getItem = async () => {
         const code = searchParams.get('code');
         
-        //get all projects
+        //get all items
         await allProjects();
+
+        //register a new student
+        if (localStorage.getItem('studName'))
+         await createStudent(
+             localStorage.getItem('studId'),
+             localStorage.getItem('studName'),
+             localStorage.getItem('studRoll')
+         );
 
         //get access token
         if (localStorage.getItem('studName') === null && code)
-            await getToken(code);
+            await getUserDetailsFromMicrosoft(code);
 
         const accessToken = localStorage.getItem('accessToken');
 
         //using access token check user is registered to project or not
-        const x = await checkStudentRegistered(accessToken);
+        const x = await checkStudentAlloted(accessToken);
 
         if (x[0] === 200) 
         {
@@ -76,52 +97,45 @@ const AllProjectsComponent = () => {
             });
         }
 
-        //register a new student
-        if (localStorage.getItem('studName'))
-            await createStudent(
-                localStorage.getItem('studId'),
-                localStorage.getItem('studName'),
-                localStorage.getItem('studRoll')
-            );
-
-
         //check the user is allowed to use the website
         checkStudentAllowed();
     };
 
     useEffect(() => {
         getItem();
+        getPartner();
     }, []);
 
     
-    const pId = students.filter((student) => student.email === localStorage.getItem('studId')).map((student, i) => {
-        return student._id;
-    });
 
-    var flag = false;
-    const partner = students
-        .filter((student) => student.partner === pId[0])
-        .map((student, i) => {
-        flag = true;
-        return student;
+    const getPartner = () => {
+        const partnerId = students.filter((student) => student.email === localStorage.getItem('studId')).map((student, i) => {
+            return student._id;
         });
 
+        var flag = false;
+        const partner = students
+            .filter((student) => student.partner === partnerId[0])
+            .map((student, i) => {
+            flag = true;
+            return student;
+            });
+
+        setFlag(flag);
+        setPartner(partner);
+    }
   
+    const userName = localStorage.getItem('studName');
 
-  
-  const userName = localStorage.getItem('studName');
-
-
-
-  const [search, setSearch] = useState('');
-  const detectChanges = async (e) => {
-    setSearch(e.target.value);
-  };
+    const [search, setSearch] = useState('');
+    const detectChanges = async (e) => {
+        setSearch(e.target.value);
+    };
 
 
 
   return (
-        <div>
+        <div className='overflow-x-hidden'>
             {loading 
             ?
             <div className="flex items-center justify-center h-screen">
@@ -132,17 +146,16 @@ const AllProjectsComponent = () => {
             {allowed 
             ?
             <div>
-                <nav className="bg-gray-800 py-1 pr-0 md:pr-12">
+                <nav className="bg-gray-800 border-y border-gray-500 border-opacity-30 py-1 pr-0 md:pr-12">
                     <div className="max-w-7xl mx-auto px-0 lg:px-200">
                         <div className="relative flex items-center justify-between h-12">
-                            <div className="flex items-center justify-start ml-2 md:ml-12">
-                                <div className="">
-                                    <i className="fas fa-search text-xl text-white pr-2 h-full" />
-                                    <div className="form-outline">
+                            <div className="flex items-center justify-start ml-2 md:ml-12 gap-2">
+                                <i className="fas fa-search text-xl text-white pr-2 h-full" />
+                                <div className="form-outline">
                                     <input
                                         id="search-input"
                                         type="search"
-                                        className="form-control border-none"
+                                        className="outline-none rounded-md p-2"
                                         name='search'
                                         placeholder="Search by Title name"
                                         value={search}
@@ -152,20 +165,19 @@ const AllProjectsComponent = () => {
                                         textAlign: "start",
                                         }}
                                     />
-                                    </div>
                                 </div>
                             </div>
                             <div className="flex items-center">
                             {!registered 
                             ?
                             <div
-                                className='text-xs md:text-lg p-1 bg-red-600 font-medium text-center text-white rounded-md mr-4'
+                                className='text-xs md:text-lg py-1 px-1 md:px-2 bg-red-600 font-medium text-center text-white rounded-md mr-4'
                             >
                                 Not Alloted
                             </div>
                             :
                             <div
-                                className='text-xs md:text-lg p-1 bg-green-600 font-medium text-center text-white rounded-md mr-4'
+                                className='text-xs md:text-lg py-1 px-1 md:px-2 bg-green-600 font-medium text-center text-white rounded-md mr-4'
                             >
                                 Alloted
                             </div>
@@ -178,11 +190,7 @@ const AllProjectsComponent = () => {
                                     className="text-gray-500 px-3 py-2 rounded-md text-xl font-x-large"
                                 >
                                     <i
-                                    className="fa-solid fa-book text-md"
-                                    style={{
-                                        backgroundColor: "transparent",
-                                        paddingRight: "0.5rem",
-                                    }}
+                                    className="fa-solid fa-book text-md pr-1"
                                     ></i>
                                     My Project
                                 </div>
@@ -191,11 +199,7 @@ const AllProjectsComponent = () => {
                                     style={{ textDecoration: "none" }}
                                 >
                                     <i
-                                    className="fa-solid fa-userId text-md"
-                                    style={{
-                                        backgroundColor: "transparent",
-                                        paddingRight: "0.5rem",
-                                    }}
+                                    className="fa-solid fa-user text-md pr-1"
                                     ></i>
                                     My Partner
                                 </div>
@@ -203,33 +207,20 @@ const AllProjectsComponent = () => {
                             :
                             <div className='hidden md:flex'>
                                 <Link
-                                    to={`/studentallproject/${projectId}`}
+                                    to={`/student/projects/${projectId}`}
                                     className="text-gray-400 hover:text-white px-3 py-2 rounded-md text-lg font-x-large"
-                                    style={{ textDecoration: "none" }}
                                 >
                                     <i
-                                    className="fa-solid fa-book text-md"
-                                    style={{
-                                        backgroundColor: "transparent",
-                                        paddingRight: "0.5rem",
-                                    }}
+                                    className="fa-solid fa-book text-md pr-1"
                                     ></i>
                                     My Project
                                 </Link>
                                 <a
                                     href='#partner'
-                                    className="text-gray-400 hover:text-white px-3 no-underline py-2 rounded-md text-lg font-x-large z-10"
-                                    style={{
-                                    textDecoration: "none",
-                                    cursor: "pointer",
-                                    }}
+                                    className="text-gray-400 hover:text-white px-3 no-underline py-2 rounded-md text-lg font-x-large z-10 cursor-pointer"
                                 >
                                     <i
-                                    className="fa-solid fa-userId text-md"
-                                    style={{
-                                        backgroundColor: "transparent",
-                                        paddingRight: "0.5rem",
-                                    }}
+                                    className="fa-solid fa-userId text-md pr-1"
                                     ></i>
                                     My Partner
                                 </a>
@@ -237,8 +228,7 @@ const AllProjectsComponent = () => {
                             }
                             <a
                                 href='#course'
-                                className="hidden md:flex text-gray-400 hover:text-white px-2 md:px-3 py-2 rounded-md text-xs  md:text-lg "
-                                style={{ textDecoration: "none" }}
+                                className="hidden md:flex text-gray-400 hover:text-white px-2 md:px-3 py-2 rounded-md text-xs  md:text-lg"
                             >
                                 About Course
                             </a>
@@ -268,7 +258,7 @@ const AllProjectsComponent = () => {
                             ?
                             <div className='flex flex-col md:hidden mt-12 z-10 border bg-white px-4 top-4 rounded-sm fixed right-8 cursor-pointer '>
                                 <a
-                                    href={`/studentallproject/${projectId}`}
+                                    href={`/student/projects/${projectId}`}
                                     className='text-gray-600 no-underline hover:text-gray-700 py-2 border-b'
                                 >
                                     My Project
@@ -295,28 +285,26 @@ const AllProjectsComponent = () => {
                     </div>
                 </nav>
     
-                <div className="split px-8 py-2 bg-gray-800 text-white">
-                    <div>
-                        <h1 className="heading  light text-2xl md:text-3xl">Welcome,</h1>
-                        <h1 className="heading bold light text-2xl md:text-3xl">
-                            {userName}
-                        </h1>
-                        <p className="text-sm md:text-lg">B.Tech. in Mechanical Engineering</p>
-                    </div>
+                <div className="flex-col px-4 md:px-12 py-4 bg-gray-800 text-white">
+                    <h1 className="light text-2xl md:text-3xl">Welcome,</h1>
+                    <h1 className="font-medium py-1 text-2xl md:text-3xl">
+                        {userName}
+                    </h1>
+                    <p className="text-sm md:text-lg">B.Tech. in Mechanical Engineering</p>
                 </div>
     
                 {/* description */}
-                <div className="container card w3-white mt-[3vh]">
-                    <br />
-                    <h2 className=" ">
-                        <i className="fa fa-book fa-fw"></i> BTP Phase I
-                    </h2>
+                <div className="my-6 border px-4 md:px-12 py-5 rounded-md">
+                    <div className="pb-2 flex gap-1 items-center">
+                        <i className="fa fa-book fa-fw text-xl"></i> 
+                        <div className='text-xl font-medium'>BTP Phase I</div>
+                    </div>
                     <hr />
-                    <h6 className="text-muted"> Description: </h6>
+                    <h6 className="pt-2"> Description: </h6>
                     <p>No description provided.</p>
                     <div className="container"></div>
                 </div>
-                <div className="roundbox sidebox borderTopRound rounded-md mt-4 ml-4 md:p-2 md:ml-12 w-2/3 md:w-1/3 bg-gray-300 p-2" style={{'fontFamily':'Manrope'}}>
+                <div className="rounded-md mt-4 ml-4 md:p-2 md:ml-12 w-2/3 md:w-1/3 bg-gray-100 p-2 text-gray-600" style={{'fontFamily':'Manrope'}}>
                     <div className="caption titled text-sm md:text-lg font-bold">
                     → Pay attention
                     <div className="top-links"></div>
@@ -331,20 +319,20 @@ const AllProjectsComponent = () => {
                     </div>
                 </div>
     
-                <div className='grid grid-cols-2 gap-0 mt-16 mx-2 md:mx-6 md:grid-cols-3 lg:grid-cols-5'>
+                <div className='grid grid-cols-2 gap-2 md:gap-4 mt-16 mx-2 md:mx-6 md:grid-cols-3 lg:grid-cols-5'>
                     {items
-                    .filter((projects) => {
+                    .filter((items) => {
                         return search.toString().toLowerCase() === ""
-                        ? projects
-                        : projects.title.toLowerCase().includes(search.toLocaleLowerCase());
+                        ? items
+                        : items.title.toLowerCase().includes(search.toLocaleLowerCase());
                     })
                     .map((project, i) => {
                         return <Projectcard key={i} project={project} />;
                     })}
                 </div>
     
-                <div id='partner' className="container mx-auto pt-24 pb-12">
-                    <div className="max-w-md mx-auto shadow-md rounded-md bg-gray-200">
+                <div id='partner' className="mx-auto pt-24 pb-12 text-gray-600">
+                    <div className="max-w-md mx-auto shadow-md rounded-md bg-gray-100">
                     <div className="p-4">
                         <h2 className="text-2xl font-bold mb-2">Partner Details</h2>
                         <hr className="my-4" />
@@ -382,48 +370,16 @@ const AllProjectsComponent = () => {
                     </div>
                 </div>
     
-                <div
-                    id='course'
-                    className="col-sm-12 col-lg-4"
-                    style={{ margin: "auto", marginTop: "5vh" }}
-                >
-                    <div className="w3-white w3-text-grey card">
-                    <div>
-                        <img
-                        src="https://iitg.ac.in/mech/static/images/placeholdercourse.jpg"
-                        width="100%"
-                        height="300"
-                        alt=""
-                        className=""
-                        style={{ objectFit: "cover" }}
-                        />
-                    </div>
-                    <div className="container text-dark font-weight-bold pt-2">
-                        <h4>About this course: </h4>
-                        <hr />
-                        <div className="text-center">
-                        <ul style={{ fontWeight: "600" }}>
-                            <li>Course Name: BTP Phase I</li>
-                            <li>Course Code: ME 398</li>
-                            <li>L-T-P-C : 0-0-3-3</li>
-                            <li>Syllabus: NaN </li>
-                            <li>Course Type: Core course</li>
-                        </ul>
-                        <hr />
-                        </div>
-                    </div>
-                    </div>
-                    <br />
-                </div>
+                <CourseStructure/>
     
                 <div
-                    className="_feedback_container_1ob32_125 pl-4 md:pl-24 lg:pl-48 bg-gray-400"
+                    className="flex items-center pl-4 md:pl-24 lg:pl-48 bg-gray-200"
                     style={{
-                    height: "15vh",
-                    width: "100vw",
-                    margin: "auto",
-                    display: "flex",
-                    alignItems: "center",
+                        height: "15vh",
+                        width: "100vw",
+                        margin: "auto",
+                        display: "flex",
+                        alignprojects: "center",
                     }}
                 >
                     <svg
@@ -448,9 +404,8 @@ const AllProjectsComponent = () => {
                     >
                     We value your opinion, please take a moment to fill out our{" "}
                     <Link
-                        className='px-1 '
+                        className='px-1 text-blue-500 hover:underline'
                         to={`/studfeedback`}
-                        style={{ textDecoration: "none" }}
                     >
                         {" "}
                         feedback form{" "}

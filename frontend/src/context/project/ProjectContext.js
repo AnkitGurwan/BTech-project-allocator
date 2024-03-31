@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
 // context api
-const ItemContext=createContext();
+const ProjectContext = createContext();
 
-export default ItemContext;
+export default ProjectContext;

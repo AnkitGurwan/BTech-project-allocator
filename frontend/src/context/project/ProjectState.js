@@ -43,6 +43,7 @@ const ItemState=(props)=>{
     };
 
 
+
     const Projectspecific = async () => {  
         const response = await fetch(`${url}/project/projectsposted`, {
             method: 'GET',
@@ -53,7 +54,7 @@ const ItemState=(props)=>{
         })
 
         const json=await (response.json())  
-        
+
         json.reverse();
         if(json)
         setItemsspecific(json);       
@@ -79,19 +80,6 @@ const ItemState=(props)=>{
             return response.status;
     };
 
-    const createStudent = async (userEmail,userName,userRoll) => {
-        const response = await fetch(`${url}/project/newstudent`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ userEmail,userName,userRoll})
-        });
-        
-        const json = await response.json(); 
-        
-        return response.status;
-};
 
     const updateProject = async (title,brief_abstract,co_supervisor,specialization,id) => {
             const response = await fetch(`${url}/project/updateproject/${id}`, {
@@ -202,23 +190,9 @@ const ItemState=(props)=>{
         return json;
     }
 
-    const checkRegisteredFunc = async (email) => {
-        const response = await fetch(`${url}/project/checkRegistered/${email}`, {
-            method: 'GET',
-            credentials:'include',
-            headers: {
-                'Content-Type': "application/json"
-            }
-        });
-        const json = await response.json();
-        var array = [];
-        array.push(response.status);
-        array.push(json.id);
-        return array;
-    }
+    
 
-    const logout=async()=>{
-        
+    const Logout = async () => {
         const tenantID = process.env.MICROSOFT_GRAPH_TENANT_ID;
         const logoutEndpoint = `https://login.microsoftonline.com/${tenantID}/oauth2/v2.0/logout?post_logout_redirect_uri=${process.env.REACT_APP_FRONTEND_URL}`;
         window.location.href = logoutEndpoint;
@@ -226,7 +200,7 @@ const ItemState=(props)=>{
     
         
     return (
-        <ItemContext.Provider value={{details,logout,getAllStudent,allProjects,createStudent,allProjectsState,createProject,updateProject,deleteProject,selectproject,deselectproject,ownerdetails,Projectspecific,itemsspecific,getSingleProject,single, getInterestedStudents,allotProject,checkRegisteredFunc}}>
+        <ItemContext.Provider value={{details, Logout, getAllStudent, allProjects,allProjectsState,createProject,updateProject,deleteProject,selectproject,deselectproject,ownerdetails,Projectspecific,itemsspecific,getSingleProject,single, getInterestedStudents,allotProject}}>
             {props.children}
         </ItemContext.Provider>
     )

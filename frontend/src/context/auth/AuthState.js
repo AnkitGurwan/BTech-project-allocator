@@ -89,7 +89,7 @@ const AuthState = (props) => {
 
 
     const getUserDetailsFromMicrosoft = async (code) => {
-        const response = await fetch(`${url}/auth/microsoft/getUserDetailsFromMicrosoft`, {
+        const response = await fetch(`${url}/auth/microsoft/getToken`, {
             method: 'GET',
             headers: {
                 'Content-Type': "application/json",
@@ -97,14 +97,15 @@ const AuthState = (props) => {
             }
         });
 
-        const json=await response.json();
+        const json = await response.json();
+        console.log("stud",json.studInformation)
 
         //save user details in local storage
-        localStorage.setItem('studName',json.studInformation.givenName);
-        localStorage.setItem('studId',json.studInformation.mail);
-        localStorage.setItem('studRoll',json.studInformation.surname);
-        localStorage.setItem('studJob',json.studInformation.jobTitle);
-        localStorage.setItem('accessToken',json.accessToken);
+        localStorage.setItem('studName', json.studInformation.givenName);
+        localStorage.setItem('studId', json.studInformation.mail);
+        localStorage.setItem('studRoll', json.studInformation.surname);
+        localStorage.setItem('studJob', json.studInformation.jobTitle);
+        localStorage.setItem('accessToken', json.accessToken);
     }
     
 
