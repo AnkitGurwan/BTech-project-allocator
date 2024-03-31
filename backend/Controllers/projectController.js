@@ -3,6 +3,7 @@ dotenv.config({ path: "config/.env" });
 
 import Project from "../Models/Project.js";
 import Student from "../Models/Student.js";
+import User from "../Models/User.js";
 
 //get all projects
 const getAllProjects = async (req, res) => {
@@ -14,7 +15,6 @@ const getAllProjects = async (req, res) => {
 //check student is alloted a project or not
 const checkStudentAlloted = async (req, res) => {
     const accessToken = req.params.accessToken;
-    console.log("acc",accessToken)
 
     const url = 'https://graph.microsoft.com/v1.0/me';
 
@@ -62,6 +62,70 @@ const newStudent = async (req, res) => {
     }
     res.status(200).json({ msg: "Success" });
 }
+
+
+//get owner details
+const getOwnerDetails = async (req, res) => {
+  const id = req.params.id;
+  const project = await Project.findById(id);
+  console.log(project)
+
+  if (!project) {
+      res.status(404).json({ msg: "Not Found" });
+  } else {
+      const user = await User.findById(project.ownerDetails);
+      if (!user) {
+          res.status(403).json({ msg: "Owner Not Found" });
+      } else {
+          res.status(200).json(user);
+      }
+  }
+};
+
+//get interested students in a project
+const getInterestedStudents = async (req, res) => {
+  const id = req.params.id;
+  const project = await Project.findById(id);
+  const interestedStudents = project.interestedPeople;
+  let array = [];
+
+  if (interestedStudents) {
+      for (let i = 0; i < interestedStudents.length; i++) {
+          const student = await Student.find({ email: interestedStudents[i] });
+          array.push(student[0].email);
+      }
+  }
+  res.status(200).json(array);
+};
+
+//find steps done by a student
+const findStepsDone = (req, res) => {
+    const id = req.params.email;
+
+    const student = Student.find({ email: id});
+    const ans = student.stepsDone;
+
+    res.status(200).json(ans);
+}
+
+
+//increase steps done by a student
+const IncreaseStepsDone = async (req, res) => {
+    const id = req.params.email;
+
+    const student = await Student.findOneAndUpdate(
+        { email: id },
+        { $inc: { stepsDone: 1 } }, // Increment stepsDone by 1
+        { new: true } // Return the updated document
+    );
+
+    if (!student) {
+        return res.status(404).json({ error: 'Student not found' });
+    }
+
+    res.status(200).json(student);
+}
+
 export {
-    getAllProjects, checkStudentAlloted, newStudent
+    getAllProjects, checkStudentAlloted, newStudent, getOwnerDetails, getInterestedStudents, findStepsDone, IncreaseStepsDone
 }

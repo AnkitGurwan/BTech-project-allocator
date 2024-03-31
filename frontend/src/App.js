@@ -11,7 +11,7 @@ import Interface from './Pages/interface.js';
 import Proflogin from './Pages/prof/auth/profAuth.js';
 import Studentlogin from './Pages/student/auth/studentAuth.js';
 import StudentHome from './Pages/student/projects/allProjects.js';
-import StudentSpecificProject from './Pages/student/projects/specificProjectComponent.js';
+import StudentSpecificProject from './Pages/student/projects/specificProject.js';
 
 const App = () => {
   return (
