@@ -23,7 +23,6 @@ app.use(express.json());
 
 //mongoose connection
 import connectDatabase from "./config/database.js"
-import authRouter from "./Views/msAuth.js";
 connectDatabase();
 
 
@@ -36,9 +35,14 @@ app.use(sessions({
     resave: false
 }));
 
-
+import authRouter from "./Views/msAuth.js";
 app.use(authRouter)
 
+import ProjectRouter from "./Views/projects.js";
+app.use('/project',ProjectRouter);
+
+import StudentRouter from "./Views/student.js";
+app.use('/student',StudentRouter);
 
 app.listen(process.env.PORT, (req, res, err) => {
     if(err){

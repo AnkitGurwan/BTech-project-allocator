@@ -62,7 +62,7 @@ export const getToken = async (req,res) => {
   formData.append('client_id', clientID);
   formData.append('client_secret', clientSecret);
   formData.append('scope', "openid profile email");
-  formData.append('redirect_uri', `${process.env.FRONTENDURL}/studentallproject`);
+  formData.append('redirect_uri', `${process.env.FRONTENDURL}/student/projects`);
   formData.append('grant_type', 'authorization_code');
   formData.append('code', req.headers.code);
   formData.append('resource', "https://graph.microsoft.com");
@@ -91,9 +91,9 @@ export const getToken = async (req,res) => {
     
     if (response2.ok) {
       const data = await response2.json();
-      console.log("stud",data)
       res.status(200).json({ studInformation: data , accessToken });
-    } else {
+    } 
+    else {
       throw new Error(await response2.text());
     }
     } 

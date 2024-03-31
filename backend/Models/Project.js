@@ -6,13 +6,13 @@ const projectSchema = new mongoose.Schema({
     co_supervisor: { type: String },
     specialization: { type: String, required: true },
     ownerDetails: { type: mongoose.Schema.Types.ObjectId, default: "000000000000000000000000" },
-    intrestedPeople: { type: Array, default: [] },
+    interestedPeople: { type: Array, default: [] },
+    allotedPeople: { type: Array, default: [] },
     creation_date: { type: String, required: true },
     creation_time: { type: String, required: true },
     updation_date: { type: String, required: false },
     updation_time: { type: String, required: false },
-    is_banned: { type: Boolean, required: true, default: false },
-    getFull: { type: String },
+    is_banned: { type: Boolean, required: true, default: false }
 });
 
 const Projects = mongoose.model("Project", projectSchema);
