@@ -1,21 +1,20 @@
-import React from 'react';
-import { Link } from "react-router-dom";
+import React, { useContext } from 'react';
+import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import StudentContext from '../context/student/StudentContext';
 
 const MainPagesHeader = () => {
+    const { LogOut } = useContext(StudentContext);
+    const Navigate = useNavigate();
 
-    const newfunc=()=>{
-        localStorage.clear('btpToken');
-        toast.success('Logged out successfully', {
-            position: toast.POSITION.TOP_CENTER
-        });
+    const logoutFunc = async () => {
+        await LogOut();
+        Navigate('/');
     };
         
     return(
-        <div 
-            className='w-full bg-gray-800 text-white flex justify-between items-center py-1 md:px-6'
-        >
+        <div className='w-full bg-gray-700 text-white flex justify-between items-center py-1 md:px-6'>
             <div class="flex items-center">
               <img 
                 class="h-10 md:h-16 w-10 md:w-16" 
@@ -32,15 +31,14 @@ const MainPagesHeader = () => {
                 </span> 
             </div> 
             
-            <span>
+            <span className='flex items-center gap-1'>
                 <i className='fa-solid fa-right-from-bracket font-bold text-xs md:text-xl md:mx-1'></i> 
-                <Link 
+                <div 
                     className='no-underline hover:bg-red-700 text-white bg-red-600 p-1 rounded-md text-center text-xs md:text-lg font-medium md:font-semibold' 
-                    to={'/'} 
-                    onClick={newfunc} 
+                    onClick={logoutFunc} 
                 >
                     LogOut
-                </Link>
+                </div>
             </span>
         </div>
 )

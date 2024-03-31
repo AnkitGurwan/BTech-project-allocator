@@ -31,7 +31,7 @@ const pca = new msal.PublicClientApplication(config);
 export const profLogin = async (req, res) => {
   const authCodeUrlParameters = {
     scopes: ['user.read'],
-    redirectUri: `${process.env.FRONTENDURL}/prof/projects`,
+    redirectUri: `${process.env.FRONTENDURL}/btp/prof/projects`,
   };
 
   const authUrl = await pca.getAuthCodeUrl(authCodeUrlParameters);
@@ -43,7 +43,7 @@ export const profLogin = async (req, res) => {
 export const studentLogin = async (req, res) => {
   const authCodeUrlParameters = {
     scopes: ['user.read'],
-    redirectUri: `${process.env.FRONTENDURL}/student/projects`,
+    redirectUri: `${process.env.FRONTENDURL}/btp/student/projects`,
   };
 
   const authUrl = await pca.getAuthCodeUrl(authCodeUrlParameters);
@@ -62,7 +62,7 @@ export const getToken = async (req,res) => {
   formData.append('client_id', clientID);
   formData.append('client_secret', clientSecret);
   formData.append('scope', "openid profile email");
-  formData.append('redirect_uri', `${process.env.FRONTENDURL}/student/projects`);
+  formData.append('redirect_uri', `${process.env.FRONTENDURL}/btp/student/projects`);
   formData.append('grant_type', 'authorization_code');
   formData.append('code', req.headers.code);
   formData.append('resource', "https://graph.microsoft.com");

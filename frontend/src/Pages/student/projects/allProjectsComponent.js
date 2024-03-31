@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 
 import ProjectContext from '../../../context/project/ProjectContext';
 import StudentContext from '../../../context/student/StudentContext'
-import Projectcard from './Projectcard';
+import Projectcard from './allProjectsProjectcard.js';
 import AuthContext from '../../../context/auth/AuthContext';
 import CourseStructure from './courseStructure.js';
 
@@ -146,7 +146,7 @@ const AllProjectsComponent = () => {
             {allowed 
             ?
             <div>
-                <nav className="bg-gray-800 border-y border-gray-500 border-opacity-30 py-1 pr-0 md:pr-12">
+                <nav className="bg-gray-700 border-y border-gray-500 border-opacity-30 py-1 pr-0 md:pr-12">
                     <div className="max-w-7xl mx-auto px-0 lg:px-200">
                         <div className="relative flex items-center justify-between h-12">
                             <div className="flex items-center justify-start ml-2 md:ml-12 gap-2">
@@ -285,7 +285,7 @@ const AllProjectsComponent = () => {
                     </div>
                 </nav>
     
-                <div className="flex-col px-4 md:px-12 py-4 bg-gray-800 text-white">
+                <div className="flex-col px-4 md:px-12 py-4 bg-gray-700 text-white">
                     <h1 className="light text-2xl md:text-3xl">Welcome,</h1>
                     <h1 className="font-medium py-1 text-2xl md:text-3xl">
                         {userName}

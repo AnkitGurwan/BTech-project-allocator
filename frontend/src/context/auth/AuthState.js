@@ -107,9 +107,15 @@ const AuthState = (props) => {
         localStorage.setItem('studJob', json.studInformation.jobTitle);
         localStorage.setItem('accessToken', json.accessToken);
     }
+
+    const LogOut = async () => {
+        const tenantID = process.env.MICROSOFT_GRAPH_TENANT_ID;
+        const logoutEndpoint = `https://login.microsoftonline.com/${tenantID}/oauth2/v2.0/logout?post_logout_redirect_uri=${process.env.REACT_APP_FRONTEND_URL}`;
+        window.location.href = logoutEndpoint;
+    }
     
 
-    return (<AuthContext.Provider value={{sendFeedback, ProfMicrosoftLogin, StudentMicrosoftLogin, ownerdetails, user, downloadDetails, interest, projectdetails, getUserDetailsFromMicrosoft}}>
+    return (<AuthContext.Provider value={{sendFeedback, ProfMicrosoftLogin, StudentMicrosoftLogin, ownerdetails, user, downloadDetails, interest, projectdetails, getUserDetailsFromMicrosoft, LogOut}}>
         {props.children}
     </AuthContext.Provider>
     )

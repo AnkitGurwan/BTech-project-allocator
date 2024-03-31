@@ -192,15 +192,11 @@ const ItemState=(props)=>{
 
     
 
-    const Logout = async () => {
-        const tenantID = process.env.MICROSOFT_GRAPH_TENANT_ID;
-        const logoutEndpoint = `https://login.microsoftonline.com/${tenantID}/oauth2/v2.0/logout?post_logout_redirect_uri=${process.env.REACT_APP_FRONTEND_URL}`;
-        window.location.href = logoutEndpoint;
-    }
+    
     
         
     return (
-        <ItemContext.Provider value={{details, Logout, getAllStudent, allProjects,allProjectsState,createProject,updateProject,deleteProject,selectproject,deselectproject,ownerdetails,Projectspecific,itemsspecific,getSingleProject,single, getInterestedStudents,allotProject}}>
+        <ItemContext.Provider value={{details, getAllStudent, allProjects,allProjectsState,createProject,updateProject,deleteProject,selectproject,deselectproject,ownerdetails,Projectspecific,itemsspecific,getSingleProject,single, getInterestedStudents,allotProject}}>
             {props.children}
         </ItemContext.Provider>
     )

@@ -10,7 +10,8 @@ import StudentState from './context/student/StudentState.js';
 import Interface from './Pages/interface.js';
 import Proflogin from './Pages/prof/auth/profAuth.js';
 import Studentlogin from './Pages/student/auth/studentAuth.js';
-import StudentHome from './Pages/student/projects/allProjects.js'
+import StudentHome from './Pages/student/projects/allProjects.js';
+import StudentSpecificProject from './Pages/student/projects/specificProjectComponent.js';
 
 const App = () => {
   return (
@@ -23,16 +24,19 @@ const App = () => {
                         <Route path='/' element={<Interface/>}/>
 
                         {/* prof login page */}
-                        <Route path='/prof' element={<Proflogin/>}/>
+                        <Route path='/btp/prof' element={<Proflogin/>}/>
 
                         {/* student login page */}
-                        <Route path='/student' element={<Studentlogin/>}/>
+                        <Route path='/btp/student' element={<Studentlogin/>}/>
 
                         {/* prof home page */}
-                        <Route path='/prof/projects' element={<Proflogin/>}/>
+                        <Route path='/btp/prof/projects' element={<Proflogin/>}/>
 
                         {/* student home page */}
-                        <Route path='/student/projects' element={<StudentHome/>}/>
+                        <Route path='/btp/student/projects' element={<StudentHome/>}/>
+
+                        {/* student particular project page */}
+                        <Route path='/btp/student/projects/:id' element={<StudentSpecificProject/>}/>
                     </Routes>
                 </BrowserRouter>
               </StudentState>
