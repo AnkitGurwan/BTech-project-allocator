@@ -14,16 +14,15 @@ import ProjectCardSpecific from './specificProjectProjectcard';
 import StudentContext from "../../../context/student/StudentContext";
 
 
-const SpecificProject = () => {
+const SpecificProjectComponent = () => {
 
     // get context
-    const { details, getSingleProject, getInterestedStudents} = useContext(ProjectContext);
+    const { details, getInterestedStudents, allProjects} = useContext(ProjectContext);
     const { ProfMicrosoftLogin } = useContext(StudentContext);
-    const {token} = useContext(AuthContext);
+    const { token } = useContext(AuthContext);
     var idtoken=token;
 
     //define states
-    const Navigate = useNavigate();
     const [allowed,setAllowed]=useState(true);
     const [loading,setLoading]=useState(true);
     
@@ -32,6 +31,7 @@ const SpecificProject = () => {
 
     const Store = [];  
     Store.push(details);
+    console.log(Store)
 
     //redux information fetch
     const studentRegisteredList = useSelector(state => state.allProjects.interestedStudents);
@@ -66,12 +66,10 @@ const SpecificProject = () => {
       //get all interested student in the project
       const x = await getInterestedStudents(id);
 
+      //get all projects
+      await allProjects();
 
-      if(x === 200)setLoading(false);
-      
-      //get particular project
-      await getSingleProject(id);
-          
+      if(x === 200)setLoading(false);    
     }
 
     useEffect(()=>{
@@ -85,10 +83,10 @@ const SpecificProject = () => {
       <div className=''>
         {allowed?
         <div>
-          <header className="bg-gray-700 border-y border-gray-500 border-opacity-30 text-white py-2 flex items-center justify-center">
+          <header className="bg-gray-800 border-y border-gray-500 border-opacity-30 text-white py-2 flex items-center justify-center">
             <Link 
               className='' 
-              to={`/studentallproject`}>
+              to={`/btp/student/projects`}>
                 <i className="fa-sharp fa-solid fa-arrow-left fa-lg pl-2 text-xl md:text-3xl" />
             </Link>
             
@@ -147,5 +145,5 @@ const SpecificProject = () => {
       </div>
     )
 }
-export default SpecificProject;
+export default SpecificProjectComponent;
 

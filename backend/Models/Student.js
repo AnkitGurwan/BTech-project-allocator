@@ -14,7 +14,10 @@ const studentSchema = new mongoose.Schema({
     is_admin: { type: Boolean, required: true, default: false },
     role: { type: String, required: true, default: "stud" },
     project_name: { type: String, default: "" },
-    partner_name: { type: String, default: "" }
+    partner_name: { type: String, default: "" },
+    stepsDone:  { type: Number, default: 0},
+    gradeCardUrl: { type: String, default: ""},
+    resumeUrl: { type: String, default: ""}
 });
 
 const Student = mongoose.model("Student", studentSchema);

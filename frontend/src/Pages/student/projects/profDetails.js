@@ -1,7 +1,7 @@
 import React from 'react';
 
-function Ownerprojectcard(props){
-    const {detail}=props;
+const ProfDetails = (props) => {
+    const { detail }=props;
    
     return(
     <div className='w-full mx-auto bg-gray-100' style={{'fontFamily':'Manrope'}}>
@@ -20,4 +20,4 @@ function Ownerprojectcard(props){
         </div>
     </div>
 )};
-export default Ownerprojectcard
+export default ProfDetails;

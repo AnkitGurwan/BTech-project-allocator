@@ -14,7 +14,7 @@ const MainPagesHeader = () => {
     };
         
     return(
-        <div className='w-full bg-gray-700 text-white flex justify-between items-center py-1 md:px-6'>
+        <div className='w-full bg-gray-800 text-white flex justify-between items-center py-1 md:px-6'>
             <div class="flex items-center">
               <img 
                 class="h-10 md:h-16 w-10 md:w-16" 
@@ -34,7 +34,7 @@ const MainPagesHeader = () => {
             <span className='flex items-center gap-1'>
                 <i className='fa-solid fa-right-from-bracket font-bold text-xs md:text-xl md:mx-1'></i> 
                 <div 
-                    className='no-underline hover:bg-red-700 text-white bg-red-600 p-1 rounded-md text-center text-xs md:text-lg font-medium md:font-semibold' 
+                    className='cursor-pointer no-underline hover:bg-red-700 text-white bg-red-600 p-1 rounded-md text-center text-xs md:text-lg font-medium md:font-semibold' 
                     onClick={logoutFunc} 
                 >
                     LogOut

@@ -144,11 +144,13 @@ const ItemState=(props)=>{
             const response = await fetch(`${url}/project/ownerdetails/${id}`, {
                     method: 'GET',
                     headers: {
-                        'Content-Type': "application/json",
-                        'auth-token':localStorage.getItem('btpToken')
+                        'Content-Type': "application/json"
                     }
                 })            
-            const json=await response.json()
+            const json = await response.json();
+            console.log("json",json)
+
+            //set prof details in redux
             setDetails(json);    
             return response.status;
     };

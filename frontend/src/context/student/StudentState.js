@@ -44,17 +44,46 @@ const StudentState = (props) => {
         
         return response.status;
     };
+
+    const findStepDone = async ( email ) => {
+        const response = await fetch(`${url}/student/stepsdone/find/${email}`,{
+            method: 'GET',
+            headers: { 
+                'Context-Type': 'application/json'
+            }
+        })
+        const json = await response.json();
+        return json;
+    }
+
+    const increaseStepDone = async ( email ) => {
+        const response = await fetch(`${url}/student/stepsdone/increase/${email}`,{
+            method: 'GET',
+            headers: { 
+                'Context-Type': 'application/json'
+            }
+        })
+
+        return response.status;
+    }
     
 
     const LogOut = async () => {
         const tenantID = process.env.MICROSOFT_GRAPH_TENANT_ID;
         const logoutEndpoint = `https://login.microsoftonline.com/${tenantID}/oauth2/v2.0/logout?post_logout_redirect_uri=${process.env.REACT_APP_FRONTEND_URL}`;
         window.location.href = logoutEndpoint;
+
+        // Delete the items from local storage
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('studId');
+        localStorage.removeItem('studJob');
+        localStorage.removeItem('studName');
+        localStorage.removeItem('studRoll');
     }
     
         
     return (
-        <StudentContext.Provider value={{LogOut,createStudent, checkStudentAlloted}}>
+        <StudentContext.Provider value={{LogOut,createStudent, checkStudentAlloted, findStepDone, increaseStepDone}}>
             {props.children}
         </StudentContext.Provider>
     )
