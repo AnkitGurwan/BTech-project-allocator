@@ -4,6 +4,8 @@ dotenv.config({path:"config/.env"});
 import express from "express";
 const app = express();
 
+import cookieParser from 'cookie-parser';
+
 
 import cors from 'cors';
 const corsOptions = {
@@ -15,9 +17,6 @@ const corsOptions = {
 app.use(cors(corsOptions)); 
 
 
-import sessions from "express-session";
-
-
 app.use(express.json());
 
 
@@ -26,14 +25,8 @@ import connectDatabase from "./config/database.js"
 connectDatabase();
 
 
-const oneHour = 1000 * 60 * 60;
-
-app.use(sessions({
-    secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
-    saveUninitialized:true,
-    cookie: { maxAge: oneHour },
-    resave: false
-}));
+// Middleware to parse cookies
+app.use(cookieParser());
 
 import authRouter from "./Views/msAuth.js";
 app.use(authRouter)

@@ -1,5 +1,5 @@
 import React from 'react';
-import Specificproject2 from '../layouts/projectcardspecific2';
+import Specificproject2 from './projectcardAllReadMore.js';
 import Header from '../../../components/mainPagesHeader.js';
 
 const AllReadMoreProjectCard = () => {

@@ -1,11 +1,11 @@
 import React from 'react';
-import Allprojects from '../layouts/professor/ownerprojects';
+import Allprojects from './ownerProjectsComponent.js';
 import Header from '../../../components/mainPagesHeader.js';
 
 
 const OwnerProjectPage = () => {
     return(
-        <div>
+        <div className='w-full h-full'>
             <Header/>
             <Allprojects/>
         </div>

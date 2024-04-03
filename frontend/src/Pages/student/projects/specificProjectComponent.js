@@ -18,46 +18,65 @@ const SpecificProjectComponent = () => {
 
     // get context
     const { details, getInterestedStudents, allProjects} = useContext(ProjectContext);
-    const { ProfMicrosoftLogin } = useContext(StudentContext);
-    const { token } = useContext(AuthContext);
-    var idtoken=token;
+    const { checkStudentEligible } = useContext(StudentContext);
+    const { getUserDetailsFromMicrosoft, StudentMicrosoftLogin } = useContext(AuthContext);
 
     //define states
-    const [allowed,setAllowed]=useState(true);
-    const [loading,setLoading]=useState(true);
+    const [allowed,setAllowed] = useState(true);
+    const [loading,setLoading] = useState(true);
+    const [random, setRandom] = useState(false);
     
     const params=useParams();
     const id = params.id;
 
     const Store = [];  
     Store.push(details);
-    console.log(Store)
 
     //redux information fetch
     const studentRegisteredList = useSelector(state => state.allProjects.interestedStudents);
     const items = useSelector(state => state.allProjects.allProjects);
+    const studentInfo = useSelector((state) => state.student.studentInfo);
 
-    const checkStudentAllowed = () => {
-      if (localStorage.getItem('studRoll') !== null || localStorage.getItem('studRoll') !== undefined) 
+     //check student allowed or not to access the page
+     const checkStudentAllowed = async () => {
+        const x = await getUserDetailsFromMicrosoft();
+        
+        if(x === 200)
         {
-            if (
-                `${process.env.REACT_APP_ROLL_LOW}` <= localStorage.getItem('studRoll') &&
-                localStorage.getItem('studRoll') <= `${process.env.REACT_APP_ROLL_HIGH}`
-            ) {
-                setAllowed(true);
-                setLoading(false);
-            } 
-            else {
-                setLoading(false);
-                setAllowed(false);
+            let surname = "";
+            if(studentInfo && studentInfo.studInfo && studentInfo.studInfo.jobTitle === "BTECH")
+            {
+                surname = studentInfo.studInfo.surname;
+                if(checkStudentEligible(surname))
+                {
+                    setAllowed(true);
+                    setLoading(false);
+                } 
+                else // not allowed
+                {
+                    setAllowed(false);
+                    setLoading(false);
+                }
             }
+            else if(random) // not allowed
+            {
+                setAllowed(false);
+                setLoading(false);
+            }
+            setRandom(true);
         } 
-        else 
+        else //not logged in or token expired
         {
             //if user if not logged in, redirect user to login page
-            ProfMicrosoftLogin();
+            await StudentMicrosoftLogin();
         }
-    }
+    };
+
+
+    useEffect(() => {
+      //check the user is allowed to use the website
+      checkStudentAllowed();
+  }, [random]);
 
     const getItem = async () => {
         
@@ -105,7 +124,7 @@ const SpecificProjectComponent = () => {
           
           <div className="flex flex-col md:flex-row md:pr-2">
             <div className='flex w-full justify-center md:pl-6 my-1 md:my-2'>
-              {items.filter((project)=>project._id === id).map((projects,i) => {return (<ProjectCardSpecific key={i} project={projects} idtoken={idtoken}/>)})}
+              {items.filter((project)=>project._id === id).map((projects,i) => {return (<ProjectCardSpecific key={i}/>)})}
             </div>
 
             <div className="md:w-1/4 flex flex-col items-center border-2 rounded-lg my-2 mx-2 md:ml-4 py-2">

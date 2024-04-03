@@ -15,9 +15,9 @@ const MainPagesHeader = () => {
         
     return(
         <div className='w-full bg-gray-800 text-white flex justify-between items-center py-1 md:px-6'>
-            <div class="flex items-center">
+            <div className="flex items-center">
               <img 
-                class="h-10 md:h-16 w-10 md:w-16" 
+                className="h-10 md:h-16 w-10 md:w-16" 
                 src="https://iitg.ac.in/mech/static/images/logo.png" 
                 alt='iitg logo'
             />

@@ -160,14 +160,14 @@ const SpecificProjectProjectcard = () =>{
 
     return(
         <div className='w-full px-2' style={{'fontFamily':'Manrope'}}>
-          <div className="p-3 rounded-lg border-2 bg-gray-100">
+          <div className="div-3 rounded-lg border-2 bg-gray-100">
             <div className="py-1">
                 <div className="flex items-center justify-center font-Manrope tracking-tight leading-5 text-lg md:text-xl bg-gray-300 rounded-sm py-2 font-semibold md:font-bold">
                   <i className="fa-solid fa-book text-xl px-2"></i>
                   {project[0].title}
                 </div>
 
-                <h5 className="card-subtitle text-muted py-2 md:py-3">
+                <div className="card-subtitle text-muted py-2 md:py-3">
                   <div className='flex items-center'>
                     <span className="material-symbols-outlined pr-1">
                     person
@@ -175,24 +175,24 @@ const SpecificProjectProjectcard = () =>{
                     <div className='text-xs md:text-sm'>{project[0].co_supervisor}</div>
                   </div>
                   <h6 className='text-xs md:text-sm'>(co-supervisor)</h6>
-                </h5>
+                </div>
                 <hr/>
 
-                <p className="text-xs md:text-[1rem] leading-normal font-Manrope py-2 md:py-3 md:pl-1">{project[0].brief_abstract}</p>
+                <div className="text-xs md:text-[1rem] leading-normal font-Manrope py-2 md:py-3 md:pl-1">{project[0].brief_abstract}</div>
 
                 <hr/>
                 
-                <p className="py-2 md:py-3">
-                  <h5 className='flex items-center pb-0 mb-0'>
+                <div className="py-2 md:py-3">
+                  <div className='flex items-center pb-0 mb-0'>
                     <span className="material-symbols-outlined pr-1">
                     school
                     </span>
                     <div className='font-semibold text-xs md:text-lg '>
                       Specialization
                     </div>
-                  </h5>
+                  </div>
                   <div className='text-xs md:text-sm pl-1'>{project[0].specialization}</div>
-                </p>
+                </div>
                   
                 {
                   loading
@@ -211,7 +211,7 @@ const SpecificProjectProjectcard = () =>{
                   ?
                   <button 
                     id="myBtn" 
-                    className='disabled cursor-not-allowed mx-auto flex justify-center items-center no-underline w-32 rounded-md text-white p-1 font-semibold mt-2 hover:bg-red-700 text-sm md:text-lg' 
+                    className='disabled cursor-not-allowed mx-auto flex justify-center items-center no-underline w-32 rounded-md text-white div-1 font-semibold mt-2 hover:bg-red-700 text-sm md:text-lg' 
                     disabled 
                     style={{'backgroundColor':'#EC2D01'}}
                   >
@@ -220,7 +220,7 @@ const SpecificProjectProjectcard = () =>{
                   :
                   <button 
                     id="myBtn" 
-                    className='mx-auto flex justify-center items-center no-underline w-24 md:w-32 rounded-md text-white p-1 font-semibold text-sm md:text-lg py-1 mt-2 bg-yellow-600 hover:bg-yellow-700' 
+                    className='mx-auto flex justify-center items-center no-underline w-24 md:w-32 rounded-md text-white div-1 font-semibold text-sm md:text-lg py-1 mt-2 bg-yellow-600 hover:bg-yellow-700' 
                     onClick={click}
                   >
                     Register
@@ -239,19 +239,19 @@ const SpecificProjectProjectcard = () =>{
                       <div className="modal-content">
                         <span className="close">&times;</span>
                         
-                        <p 
+                        <div 
                           id='myButton' 
                           className='modalp text-lg'
                         >
                             Are you sure you want to De-register? 
                             <Link 
-                              className='flex justify-center items-center no-underline w-32 rounded-md text-white p-1 font-medium' 
+                              className='flex justify-center items-center no-underline w-32 rounded-md text-white div-1 font-medium' 
                               style={{'backgroundColor':'#EC2D01'}} 
                               onClick={submit}
                             >
                                 De-Register
                             </Link>
-                          </p>
+                          </div>
                       </div>
                     </div>
                     :

@@ -6,9 +6,9 @@ import { IncreaseStepsDone, checkStudentAlloted, findStepsDone, newStudent } fro
 
 const router = express.Router();
 
-router.get("/checkAlloted/:accessToken", checkStudentAlloted);
+router.get("/checkAlloted/:email", checkStudentAlloted);
 router.post("/newstudent", newStudent);
-router.get("/stepsdone/find", findStepsDone);
+router.get("/stepsdone/find/:email", findStepsDone);
 router.get("/stepsdone/increase", IncreaseStepsDone);
 
 const student = router;

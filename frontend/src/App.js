@@ -14,7 +14,7 @@ import StudentHome from './Pages/student/projects/allProjects.js';
 import StudentSpecificProject from './Pages/student/projects/specificProject.js';
 import ProfallProjectPage from './Pages/prof/projects/allProjectPage.js';
 import OwnerProjectPage from './Pages/prof/projects/ownerProjectPage.js';
-import ProfReadMore from './Pages/prof/projects/profReadMorePage.js';
+import ProfReadMore from './Pages/prof/projects/ownerReadMorePage.js';
 import AllReadMore from './Pages/prof/projects/allReadMorePage.js';
 
 const App = () => {
@@ -31,16 +31,16 @@ const App = () => {
                         <Route path='/btp/prof' element={<Proflogin/>}/>
 
                         {/* prof home page */}
-                        <Route path='/btp/prof/projects/owner' element={<OwnerProjectPage/>}/>
+                        <Route path='/btp/prof/owner/projects' element={<OwnerProjectPage/>}/>
 
                         {/* All project page */}
-                        <Route path='/btp/prof/projects/all' element={<ProfallProjectPage/>}/>
+                        <Route path='/btp/prof/all/projects' element={<ProfallProjectPage/>}/>
 
                         {/* prof particular project page */}
-                        <Route path='/btp/prof/projects/owner/:id' element={<ProfReadMore/>}/>
+                        <Route path='/btp/prof/onwer/projects/:id' element={<ProfReadMore/>}/>
 
                         {/* Allprojects particular project page */}
-                        <Route path='/btp/prof/projects/all/:id' element={<AllReadMore/>}/>
+                        <Route path='/btp/prof/all/projects/:id' element={<AllReadMore/>}/>
 
                         
                         {/* student login page */}
