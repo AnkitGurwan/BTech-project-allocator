@@ -2,7 +2,8 @@ import dotenv from "dotenv";
 dotenv.config({path:"config/.env"});
 
 import msal from '@azure/msal-node';
-import fetch from "node-fetch"
+import fetch from "node-fetch";
+import Student from "../Models/Student.js";
 
 const clientID = process.env.MICROSOFT_GRAPH_CLIENT_ID;
 const tenantID = process.env.MICROSOFT_GRAPH_TENANT_ID;
@@ -31,7 +32,7 @@ const pca = new msal.PublicClientApplication(config);
 export const profLogin = async (req, res) => {
   const authCodeUrlParameters = {
     scopes: ['user.read'],
-    redirectUri: `${process.env.FRONTENDURL}/btp/prof/projects`,
+    redirectUri: `${process.env.BACKENDURL}/auth/microsoft/getToken`,
   };
 
   const authUrl = await pca.getAuthCodeUrl(authCodeUrlParameters);
@@ -41,63 +42,109 @@ export const profLogin = async (req, res) => {
 
 //microsoft student login
 export const studentLogin = async (req, res) => {
-  const authCodeUrlParameters = {
-    scopes: ['user.read'],
-    redirectUri: `${process.env.FRONTENDURL}/btp/student/projects`,
-  };
+  try{
+    const authCodeUrlParameters = {
+      scopes: ['user.read'],
+      redirectUri: `${process.env.BACKENDURL}/auth/microsoft/getToken`,
+    };
 
-  const authUrl = await pca.getAuthCodeUrl(authCodeUrlParameters);
+    const authUrl = await pca.getAuthCodeUrl(authCodeUrlParameters);
 
-  res.redirect(authUrl);
+    res.redirect(authUrl);
+  }
+  catch(err) {
+    res.status(500).json({msg : err.message});
+  }
 };
 
 
 
 export const getToken = async (req,res) => {
+  try{
+    const code = req.query.code;
 
-  const url = `https://login.microsoftonline.com/${tenantID}/oauth2/token`;
-  const formData = new URLSearchParams();
+    const url = `https://login.microsoftonline.com/${tenantID}/oauth2/token`;
+    const formData = new URLSearchParams();
 
-  //formdata
-  formData.append('client_id', clientID);
-  formData.append('client_secret', clientSecret);
-  formData.append('scope', "openid profile email");
-  formData.append('redirect_uri', `${process.env.FRONTENDURL}/btp/student/projects`);
-  formData.append('grant_type', 'authorization_code');
-  formData.append('code', req.headers.code);
-  formData.append('resource', "https://graph.microsoft.com");
+    //formdata
+    formData.append('client_id', clientID);
+    formData.append('client_secret', clientSecret);
+    formData.append('scope', "openid profile email");
+    formData.append('redirect_uri', `${process.env.BACKENDURL}/auth/microsoft/getToken`);
+    formData.append('grant_type', 'authorization_code');
+    formData.append('code', code);
+    formData.append('resource', "https://graph.microsoft.com");
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: formData.toString(),
-  });
-  
-
-  if (response.ok) {
-    const data = await response.json();
-   
-    const accessToken=data.access_token;
-    
-    const url2 = 'https://graph.microsoft.com/v1.0/me';
-
-    const response2 = await fetch(url2, {
+    const response = await fetch(url, {
+      method: 'POST',
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
+      body: formData.toString(),
     });
     
-    if (response2.ok) {
-      const data = await response2.json();
-      res.status(200).json({ studInformation: data , accessToken });
-    } 
-    else {
-      throw new Error(await response2.text());
+
+    if (response.ok) {
+      const data = await response.json();
+    
+      const accessToken=data.access_token;
+      
+      const url2 = 'https://graph.microsoft.com/v1.0/me';
+
+      const response2 = await fetch(url2, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      
+      if (response2.ok) {
+        const data = await response2.json();
+        
+        // Set access token as an HTTP cookie
+        res.cookie('btp_student_accessToken', accessToken, { httpOnly: true, secure: true });
+
+        // Redirect to frontend page
+        res.redirect(`${process.env.FRONTENDURL}/btp/student/projects`);
+      } 
+      else {
+        throw new Error(await response2.text());
+      }
+      } 
+      else {
+        throw new Error(await response.text());
+      }
     }
-    } 
-    else {
-      throw new Error(await response.text());
+    catch(err) {
+      res.status(500).json({msg : err.message});
     }
   };
+
+
+export const getInfo = async (req, res) => {
+  try{
+    // Retrieve cookie value
+    const accessToken = req.cookies.btp_student_accessToken;
+
+    const url = 'https://graph.microsoft.com/v1.0/me';
+
+    const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+
+        res.status(200).json({ studInfo: data});
+      } 
+      else {
+        res.status(401).json( { msg:'User not registered'});
+      }
+  }
+  catch(err) {
+    res.status(500).json({msg : err.message});
+  }
+    
+  };
+

@@ -12,6 +12,8 @@ const projectSchema = new mongoose.Schema({
     creation_time: { type: String, required: true },
     updation_date: { type: String, required: false },
     updation_time: { type: String, required: false },
+    gradeCardRequired:{ type: Boolean, default: false},
+    resumeRequired:{ type: Boolean, default: false},
     is_banned: { type: Boolean, required: true, default: false }
 });
 

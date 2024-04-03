@@ -7,9 +7,9 @@ const InterfacePageHeader = () => {
             className='w-full text-white flex justify-between items-center py-3 md:px-6' 
             style={{'backgroundColor':'#10A19D'}}
         >
-            <div class="navbar-brand float-left flex items-center mx-4">
+            <div className="navbar-brand float-left flex items-center mx-4">
                 <img 
-                    class="h-12 md:h-20 w-12 md:w-20" 
+                    className="h-12 md:h-20 w-12 md:w-20" 
                     src="https://iitg.ac.in/mech/static/images/logo.png" 
                     alt='iitg logo'
                 />

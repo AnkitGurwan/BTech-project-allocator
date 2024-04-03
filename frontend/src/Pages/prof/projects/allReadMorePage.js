@@ -1,5 +1,5 @@
 import React from 'react';
-import Specificproject2 from '../layouts/readmore2';
+import Specificproject2 from './allReadMoreComponent.js';
 import Header from '../../../components/mainPagesHeader.js';
 
 const AllReadMorePage = () => {

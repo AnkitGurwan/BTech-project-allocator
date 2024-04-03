@@ -12,12 +12,10 @@ import CourseStructure from './courseStructure.js';
 
 const AllProjectsComponent = () => {
 
-    const [searchParams, setSearchParams] = useSearchParams();
-
     //context apis
     const { allProjects } = useContext(ProjectContext);
     const { getUserDetailsFromMicrosoft, StudentMicrosoftLogin } = useContext(AuthContext);
-    const { createStudent, checkStudentAlloted, findStepDone, LogOut } = useContext(StudentContext);
+    const { createStudent, checkStudentAlloted, findStepDone, LogOut, checkStudentEligible } = useContext(StudentContext);
     
     //react states
     const [mobileMenu, setMobileMenu] = useState(false);
@@ -27,90 +25,110 @@ const AllProjectsComponent = () => {
     const [projectId,setProjectId] = useState('');
     const [partner, setPartner] = useState('');
     const [flag, setFlag] = useState(false);
+    const [random, setRandom] = useState(false);
 
 
     //get details from redux store
     const items = useSelector((state) => state.allProjects.allProjects);
     const students = useSelector((state) => state.student.allStudents);
+    const studentInfo = useSelector((state) => state.student.studentInfo);
+
+
+
+    const getItem = async () => {console.log("yu")
+        
+        //get all items
+        await allProjects();
+
+        //register a new student
+        if (studentInfo && studentInfo.studInfo)
+        {
+            const x = await createStudent(
+                studentInfo.studInfo.mail,
+                studentInfo.studInfo.displayName,
+                studentInfo.studInfo.surname
+            );      
+            
+            if(x === 202) //already registered
+            {
+                checkRegistered();
+            }
+        }
+    };
 
 
     //check student allowed or not to access the page
     const checkStudentAllowed = async () => {
-        if (localStorage.getItem('studRoll') !== null && localStorage.getItem('studRoll') !== undefined) 
+        const x = await getUserDetailsFromMicrosoft();
+        
+        if(x === 200)
         {
-            if (
-                `${process.env.REACT_APP_ROLL_LOW}` <= localStorage.getItem('studRoll') &&
-                localStorage.getItem('studRoll') <= `${process.env.REACT_APP_ROLL_HIGH}`
-            ) {
-                setAllowed(true);
-                setLoading(false);
-            } 
-            else {
-                setLoading(false);
-                setAllowed(false);
+            let surname = "";
+            if(studentInfo && studentInfo.studInfo && studentInfo.studInfo.jobTitle === "BTECH")
+            {
+                surname = studentInfo.studInfo.surname;
+                if(checkStudentEligible(surname))
+                {
+                    setAllowed(true);
+                    setLoading(false);
+                } 
+                else // not allowed
+                {
+                    setAllowed(false);
+                    setLoading(false);
+                }
             }
+            else if(random) // not allowed
+            {
+                setAllowed(false);
+                setLoading(false);
+            }
+            setRandom(true);
         } 
-        else 
+        else //not logged in or token expired
         {
             //if user if not logged in, redirect user to login page
             await StudentMicrosoftLogin();
         }
     };
 
-
-    //get access token
-    const getItem = async () => {
-        const code = searchParams.get('code');
-        
-        //get all items
-        await allProjects();
-
-        //register a new student
-        if (localStorage.getItem('studName'))
-         await createStudent(
-             localStorage.getItem('studId'),
-             localStorage.getItem('studName'),
-             localStorage.getItem('studRoll')
-         );
-
-        //get access token
-        if (localStorage.getItem('studName') === null && code)
-            await getUserDetailsFromMicrosoft(code);
-
-        const accessToken = localStorage.getItem('accessToken');
-
-        //using access token check user is registered to project or not
-        const x = await checkStudentAlloted(accessToken);
-
-        if (x[0] === 200) 
+    const checkRegistered = async () => {
+        // using email to check user is registered to project or not
+        if (studentInfo && studentInfo.studInfo)
         {
-            setProjectId(x[1]);
-            setRegistered(true);
+            const x = await checkStudentAlloted(studentInfo.studInfo.mail);
+
+            if (x[0] === 200) 
+            {
+                setProjectId(x[1]);
+                setRegistered(true);
+            }
+            else if( x === 400) setRegistered(false);
+            else if(x === 401)
+            {
+                await LogOut();
+                toast.success('Session Expired, Please Login again', {
+                    position: toast.POSITION.TOP_CENTER
+                });
+            }
         }
-        else if( x === 400) setRegistered(false);
-        else if(x === 401)
-        {
-            localStorage.clear('studName', 'studId', 'studRoll', 'studJob', 'accessToken');
-            await LogOut();
-            toast.success('Session Expired, Please Login again', {
-                position: toast.POSITION.TOP_CENTER
-            });
-        }
+    }
+
+
+    useEffect(() => {
+        getPartner();
 
         //check the user is allowed to use the website
         checkStudentAllowed();
-    };
-
-    useEffect(() => {
-        getItem();
-        getPartner();
         handlerNextWork();
-    }, []);
+        
+        getItem();
+    }, [random]);
 
     
 
     const getPartner = () => {
-        const partnerId = students.filter((student) => student.email === localStorage.getItem('studId')).map((student, i) => {
+        const partnerId = students.filter((student) => student.email === studentInfo.studInfo.mail).map((student, i) => {
             return student._id;
         });
 
@@ -138,7 +156,7 @@ const AllProjectsComponent = () => {
 
 
     const works = [
-        "Submit grade card, or Resume(optional)",
+        "Submit grade card(mandatory), or Resume(optional)",
         "Choose your partner (Note :- Send your partner a request from above link. Refrain from sending unwanted requests)",
         "Register for a project (Note :- You can register for multiple projects at a time but you will be alloted only one project)",
         "Allotment pending at professor end for one or more projects",
@@ -146,12 +164,19 @@ const AllProjectsComponent = () => {
     ]
 
     const handlerNextWork = async () => {
-        const id = localStorage.getItem('studId');
+        const id = studentInfo ? studentInfo.studInfo ? studentInfo.studInfo.mail : "" : "";
 
-        const x = await findStepDone(id);
+        if(id !== "")
+        {
+            const x = await findStepDone(id);
         
-        setProgress(x);
-        setNextWork(works[x]);
+            setProgress(x);
+            setNextWork(works[x]);
+        }
+        else{
+            setProgress(0);
+            setNextWork(works[0]);
+        }
     }
 
 
@@ -310,7 +335,7 @@ const AllProjectsComponent = () => {
                         <div className='flex-col'>
                             <h1 className="light text-2xl md:text-3xl">Welcome,</h1>
                             <h1 className="font-medium py-1 text-2xl md:text-3xl">
-                                {userName}
+                                {studentInfo ? studentInfo.studInfo.givenName : ""}
                             </h1>
                             <p className="text-sm md:text-lg">B.Tech. in Mechanical Engineering</p>
                         </div>

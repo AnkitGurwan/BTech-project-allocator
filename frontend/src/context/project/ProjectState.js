@@ -26,11 +26,10 @@ const ItemState=(props)=>{
         const response = await fetch(`${url}/project/allprojects`, {
             method: 'GET',
             headers: {
-                'Content-Type': "application/json",
-                'auth-token':localStorage.getItem('btpToken')
+                'Content-Type': "application/json"
             }
         });
-        const json=await response.json();
+        const json = await response.json();
 
         //reverse the array to get the latest project at top
         json.reverse();
@@ -45,15 +44,15 @@ const ItemState=(props)=>{
 
 
     const Projectspecific = async () => {  
-        const response = await fetch(`${url}/project/projectsposted`, {
+        const response = await fetch(`${url}/project/specificProject`, {
             method: 'GET',
             headers: {
                 'Content-Type': "application/json",
-                'auth-token': localStorage.getItem('btpToken')
+                'auth-token': localStorage.getItem('prof_auth_token')
             }
         })
 
-        const json=await (response.json())  
+        const json = await (response.json())  
 
         json.reverse();
         if(json)
@@ -69,7 +68,7 @@ const ItemState=(props)=>{
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'auth-token':localStorage.getItem('btpToken')
+                    'auth-token':localStorage.getItem('prof_auth_token')
                 },
                 body: JSON.stringify({ title,brief_abstract,co_supervisor,specialization})
             });
@@ -86,7 +85,7 @@ const ItemState=(props)=>{
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
-                    'auth-token':localStorage.getItem('btpToken')
+                    'auth-token':localStorage.getItem('prof_auth_token')
                 },
                 body: JSON.stringify({ title,brief_abstract,co_supervisor,specialization})
             });
@@ -100,15 +99,15 @@ const ItemState=(props)=>{
                 method: 'DELETE',
                 headers: {
                     'Content-Type': "application/json",
-                    'auth-token':localStorage.getItem('btpToken')
+                    'auth-token':localStorage.getItem('prof_auth_token')
                 }
             });
             dispatch(delProject(id));
             return response.status;
     };
 
-    const selectproject = async (id,accessToken,partner)=>{       
-            const response = await fetch(`${url}/project/projectaddition/${id}/${accessToken}/${partner}`,  {
+    const selectproject = async (id, accessToken)=>{       
+            const response = await fetch(`${url}/project/projectaddition/${id}/${accessToken}`,  {
                 method: 'GET',
                 credentials:'include',
                 headers: {
@@ -118,7 +117,7 @@ const ItemState=(props)=>{
             return response.status
     };
 
-    const allotProject = async(id,user,friend)=>{   
+    const allotProject = async (id,user,friend)=>{   
             const response = await fetch(`${url}/project/allotProject/${id}/${user}/${friend}`,  {
                 method: 'GET',
                 headers: {
@@ -129,8 +128,8 @@ const ItemState=(props)=>{
     };
 
 
-    const deselectproject=async(id,user)=>{       
-            const response = await fetch(`${url}/project/deselectproject/${id}/${user}`,  {
+    const deselectproject = async(id, accessToken)=>{       
+            const response = await fetch(`${url}/project/deselectproject/${id}/${accessToken}`,  {
                 method: 'GET',
                 headers: {
                     'Content-Type': "application/json"
@@ -140,7 +139,7 @@ const ItemState=(props)=>{
     };
         
 
-    const ownerdetails=async(id)=>{          
+    const ownerdetails = async( id )=>{          
             const response = await fetch(`${url}/project/ownerdetails/${id}`, {
                     method: 'GET',
                     headers: {
@@ -148,7 +147,6 @@ const ItemState=(props)=>{
                     }
                 })            
             const json = await response.json();
-            console.log("json",json)
 
             //set prof details in redux
             setDetails(json);    
@@ -163,12 +161,14 @@ const ItemState=(props)=>{
                     }
                 })            
             const json=await response.json();
-            dispatch(setInterestedStudents(json));    
+
+            dispatch(setInterestedStudents(json));   
+
             return response.status;
     };
 
 
-    const getAllStudent=async()=>{     
+    const getAllStudent = async()=>{     
             const response = await fetch(`${url}/project/getallstudent`, {
                     method: 'GET',
                     headers: {
@@ -192,9 +192,6 @@ const ItemState=(props)=>{
         return json;
     }
 
-    
-
-    
     
         
     return (

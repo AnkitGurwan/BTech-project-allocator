@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ProjectContext from '../../../context/project/ProjectContext';
-import ProjectCard from './projectcard';
+import ProjectCard from './ownerProjectCard';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useSelector } from 'react-redux';
@@ -10,6 +10,8 @@ const OwnerProjectsComponent = () => {
   const { Projectspecific, createProject } = useContext(ProjectContext);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  
   const navigate = useNavigate();
 
   const [count, setCount] = useState(0);
@@ -89,16 +91,6 @@ const OwnerProjectsComponent = () => {
         }
       };
 
-      const openModal = () => {
-        const modal = document.getElementById("myModal");
-        modal.style.display = "block";
-      };
-
-      const closeModal = () => {
-        const modal = document.getElementById("myModal");
-        modal.style.display = "none";
-      };
-
   const download = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('btpToken');
@@ -109,25 +101,29 @@ const OwnerProjectsComponent = () => {
   };
   
   return (
-    <div class="flex">
-      <div class="text-left">
+    <div class="w-full">
+      <div class="w-full text-left">
         <nav class="shadow-md">
-          <div class="max-w-7xl mx-auto px-2 sm:px-10 lg:px-200">
-            <div class="flex items-center justify-between h-20">
-              <div class="flex items-center justify-start" style={{ marginLeft: '7vw' }}>
-                <div class="input-group" className="searchdiv1">
-                  <i class="fas fa-search text-xl h-full pr-4 "></i>
-                  <div class="form-outline">
-                    <input
-                      id="search-input"
-                      type="search"
-                      class="form-control w-[40%] md:w-[30%] text-center"
-                      name="search"
-                      placeholder="Search by Title name"
-                      value={search}
-                      onChange={detectChanges}
-                    />
-                  </div>
+          <div class="mx-auto p-2">
+            <div class="flex items-center justify-between h-16">
+              <div class="flex items-center justify-start">
+                <div className="flex items-center justify-start gap-2 px-2">
+                    <i className="fas fa-search text-xl pr-2 h-full" />
+                    <div className="form-outline">
+                        <input
+                            id="search-input"
+                            type="search"
+                            className="outline-none border rounded-md p-2"
+                            name='search'
+                            placeholder="Search by Title name"
+                            value={search}
+                            onChange={detectChanges}
+                            style={{
+                            width: "30vw",
+                            textAlign: "start",
+                            }}
+                        />
+                    </div>
                 </div>
               </div>
               <div class="absolute inset-y-0 right-0 hidden md:flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
@@ -142,7 +138,7 @@ const OwnerProjectsComponent = () => {
                   My Projects
                 </div>
                 <Link
-                  to={`/mainpage`}
+                  to={`/btp/prof/all/projects`}
                   class="text-gray-700 hover:text-gray-500 px-3 py-2 no-underline rounded-md text-xl font-x-large"
                 >
                   All Projects
@@ -161,7 +157,7 @@ const OwnerProjectsComponent = () => {
                 <div className="flex flex-col md:hidden mt-12 z-10 border bg-white px-4 top-4 rounded-sm fixed left-8 cursor-pointer ">
                   <div className="text-gray-700 font-bold no-underline py-2 text-lg border-b">My Projects</div>
                   <Link
-                    to={`/mainpage`}
+                    to={`/btp/prof/all/projects`}
                     className="text-gray-600 hover:text-gray-700 text-lg py-2 border-b no-underline"
                   >
                     All projects
@@ -172,8 +168,8 @@ const OwnerProjectsComponent = () => {
           </div>
         </nav>
 
-        <div className="flex justify-end m-3">
-          <div id="myBtn" className="rounded-sm md:rounded-md bg-red-700 text-white font-medium cursor-pointer hover:bg-red-600" onClick={openModal}>
+        <div className="flex justify-end p-4">
+          <div id="myBtn" className="rounded-sm md:rounded-md bg-red-700 text-white font-medium cursor-pointer hover:bg-red-600" onClick={()=>{setShowModal(!showModal)}}>
             <div className="p-2 text-lg md:text-xl">NEW PROJECT</div>
           </div>
         </div>
@@ -265,90 +261,99 @@ const OwnerProjectsComponent = () => {
       </div>
             
 
-            {/* modal on new project */}
-              <div id="myModal" class="modal2">
-                <div class="modal-content2">
-                  <span class="close" onClick={closeModal} style={{"justify-content":"start","height":"50px"}}>&times;</span>
-                  <form class="w-full mx-auto bg-white px-4 md:px-8 mb-4" onSubmit={submit}>
-                    <div class="mb-4">
-                      <label class="block text-gray-600 font-bold mb-2 text-sm d-flex justify-content-start items-center" for="username">
-                        <span class="material-symbols-outlined pr-1">
-                          bookmark
-                        </span>
-                        Project Title
-                      </label>
-                      <input
-                        class="appearance-none border rounded text-sm w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
-                        id="username"
-                        type="text"
-                        placeholder="Enter project title"
-                        name="title"
-                        autoFocus
-                        onChange={onChangeHandler}
-                        value={itemData.title}
-                        required
-                      />
-                    </div>
-                    <div class="mb-4">
-                      <label class="block text-gray-600 text-sm font-bold mb-2 d-flex justify-content-start" for="email">
-                        Brief Abstract:
-                      </label>
-                      <textarea
-                        id="message"
-                        rows="5"
-                        class="block w-full text-sm text-gray-800 bg-gray-50 rounded-lg border border-gray-300 focus:outline-none focus:shadow-outline dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-500 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 px-3 py-2"
-                        placeholder="Write project details..."
-                        name="abstract"
-                        onChange={onChangeHandler}
-                        value={itemData.abstract}
-                        required
-                      ></textarea>
-                    </div>
-                    <div class="mb-4">
-                      <label class="block text-gray-600 text-sm font-bold mb-2 d-flex justify-content-start items-center" for="confirm-password">
-                        <span class="material-symbols-outlined pr-1">
-                          person
-                        </span>
-                        Co-Supervisor
-                      </label>
-                      <input
-                        class="appearance-none border text-sm rounded w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
-                        id="confirm-password"
-                        type="text"
-                        placeholder="Name of Co-Supervisor"
-                        name="cosupervisor"
-                        onChange={onChangeHandler}
-                        value={itemData.cosupervisor}
-                        required
-                      />
-                    </div>
-                    <div class="mb-8">
-                      <label class="block text-gray-600 text-sm font-bold mb-2 d-flex justify-content-start items-center" for="password">
-                        <span class="material-symbols-outlined pr-1">
-                          school
-                        </span>
-                        Specialization:
-                      </label>
-                      <input
-                        class="appearance-none border text-sm rounded w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
-                        type="text"
-                        placeholder="Enter the specialization"
-                        name="specialization"
-                        onChange={onChangeHandler}
-                        value={itemData.specialization}
-                        required
-                      />
-                    </div>
-
-                    <div class="flex items-center justify-center">
-                      <button class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-100" type="submit">
-                        Submit
-                      </button>
-                    </div>
-                  </form>
+        {/* modal on new project */}
+        {/* modal on new project */}
+        {showModal
+          ?
+          <div id="myModal" className="z-10 absolute top-[2%] flex justify-center items-center w-full h-full backdrop-blur-50">
+            <div className="px-4 pb-2 rounded-md bg-white w-1/2 border border-gray-300 border-opacity-40 shadow-md">
+              <span 
+                className="pt-1 pr-2 text-4xl flex justify-end"
+              >
+                <div className='cursor-pointer text-gray-600' onClick={() => {setShowModal(false)}}>&times;</div>
+              </span>
+              <form class="w-full mx-auto px-4 md:px-8 mb-3" onSubmit={submit}>
+                <div class="mb-3">
+                  <label class="text-gray-600 font-bold mb-2 text-sm flex justify-start items-center" for="username">
+                    <span class="material-symbols-outlined pr-1">
+                      bookmark
+                    </span>
+                    <div>Project Title</div>
+                  </label>
+                  <input
+                    class="appearance-none border rounded text-sm w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
+                    id="username"
+                    type="text"
+                    placeholder="Enter project title"
+                    name="title"
+                    autoFocus
+                    onChange={onChangeHandler}
+                    value={itemData.title}
+                    required
+                  />
                 </div>
-              </div>
+                <div class="mb-3">
+                  <label class="text-gray-600 font-bold mb-2 text-sm flex justify-start items-center" for="email">
+                    Brief Abstract:
+                  </label>
+                  <textarea
+                    id="message"
+                    rows="5"
+                    class="block w-full text-sm text-gray-800 bg-gray-50 rounded-lg border border-gray-300 focus:outline-none focus:shadow-outline dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-500 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 px-3 py-2"
+                    placeholder="Write project details..."
+                    name="abstract"
+                    onChange={onChangeHandler}
+                    value={itemData.abstract}
+                    required
+                  ></textarea>
+                </div>
+                <div class="mb-3">
+                  <label class="text-gray-600 font-bold mb-2 text-sm flex justify-start items-center" for="confirm-password">
+                    <span class="material-symbols-outlined pr-1">
+                      person
+                    </span>
+                    Co-Supervisor
+                  </label>
+                  <input
+                    class="appearance-none border text-sm rounded w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
+                    id="confirm-password"
+                    type="text"
+                    placeholder="Name of Co-Supervisor"
+                    name="cosupervisor"
+                    onChange={onChangeHandler}
+                    value={itemData.cosupervisor}
+                    required
+                  />
+                </div>
+                <div class="mb-4">
+                  <label class="text-gray-600 font-bold mb-2 text-sm flex justify-start items-center" for="password">
+                    <span class="material-symbols-outlined pr-1">
+                      school
+                    </span>
+                    Specialization:
+                  </label>
+                  <input
+                    class="appearance-none border text-sm rounded w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
+                    type="text"
+                    placeholder="Enter the specialization"
+                    name="specialization"
+                    onChange={onChangeHandler}
+                    value={itemData.specialization}
+                    required
+                  />
+                </div>
+
+                <div class="flex items-center justify-center">
+                  <button class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-100" type="submit">
+                    Submit
+                  </button>
+                </div>
+              </form>
             </div>
+          </div>
+          :
+          ""}
+        </div>
     )
 }
 export default OwnerProjectsComponent;

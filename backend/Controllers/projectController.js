@@ -7,26 +7,20 @@ import User from "../Models/User.js";
 
 //get all projects
 const getAllProjects = async (req, res) => {
-    const projects = await Project.find();
-    res.status(200).json(projects);
+    try{
+        const projects = await Project.find();
+        res.status(200).json(projects);
+    }
+    catch(err) {
+        res.status(500).json({msg : err.message});
+      }
 };
 
 
 //check student is alloted a project or not
 const checkStudentAlloted = async (req, res) => {
-    const accessToken = req.params.accessToken;
-
-    const url = 'https://graph.microsoft.com/v1.0/me';
-
-    const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        const email = data.mail;
+    try{
+        const email = req.params.email;
         
         const student = await Student.find({ email: email });
 
@@ -36,11 +30,11 @@ const checkStudentAlloted = async (req, res) => {
             flag = true;
         }
 
-        if (flag) res.status(200).json({id: String(student[0].projectName)});
-        else res.status(400).json({ msg: "false" });
-      } 
-      else {
-        res.status(401).json( { msg:'User not registered'});
+        if (flag) res.status(200).json({id : String(student[0].projectName)});
+        else res.status(202).json({ msg: "not registered" });
+    }
+    catch(err) {
+        res.status(500).json({msg : err.message});
       }
     
 };
@@ -48,19 +42,26 @@ const checkStudentAlloted = async (req, res) => {
 
 //register a new student
 const newStudent = async (req, res) => {
-    const isValid = await Student.findOne({ email: req.body.userEmail });
+    try{
+        const isValid = await Student.findOne({ email: req.body.userEmail });
 
-    if (!isValid) {
-        await Student.create({
-            name: req.body.userName,
-            email: req.body.userEmail,
-            rollNum: req.body.userRoll,
-            projectName: '000000000000000000000000',
-            partner: '000000000000000000000000',
-            is_banned: false,
-        });
+        if (!isValid) {
+            await Student.create({
+                name: req.body.userName,
+                email: req.body.userEmail,
+                rollNum: req.body.userRoll,
+                projectName: '000000000000000000000000',
+                partner: '000000000000000000000000',
+                is_banned: false,
+            });
+
+            res.status(200).json({ msg: "Success" });
+        }
+        else res.status(202).json({ msg: "already there" });
     }
-    res.status(200).json({ msg: "Success" });
+    catch(err) {
+        res.status(500).json({msg : err.message});
+    }
 }
 
 
@@ -68,7 +69,6 @@ const newStudent = async (req, res) => {
 const getOwnerDetails = async (req, res) => {
   const id = req.params.id;
   const project = await Project.findById(id);
-  console.log(project)
 
   if (!project) {
       res.status(404).json({ msg: "Not Found" });
@@ -98,14 +98,20 @@ const getInterestedStudents = async (req, res) => {
   res.status(200).json(array);
 };
 
+
 //find steps done by a student
-const findStepsDone = (req, res) => {
-    const id = req.params.email;
+const findStepsDone = async (req, res) => {
+    try{
+        const email = req.params.email;
 
-    const student = Student.find({ email: id});
-    const ans = student.stepsDone;
+        const student = await Student.find({ email: email});
+        const ans = student ? student[0].stepsDone : 0;
 
-    res.status(200).json(ans);
+        res.status(200).json({ ans : ans });
+    }
+    catch(err) {
+        res.status(500).json({msg : err.message});
+    }
 }
 
 

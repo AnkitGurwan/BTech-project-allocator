@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit"
 var _ = require('lodash');
 
 const initialState = {
+    studentInfo: [],
     intrestedPeople:[],
     partnerDetails:"",
     studentProject:"",
@@ -12,6 +13,12 @@ const studentSlice = createSlice({
     name:"student",
     initialState,
     reducers:{
+        setStudentInfo(state,action){
+            return {
+                ...state,
+                studentInfo: action.payload
+              };
+        }, 
         addStudent(state,action){
             return {
                 ...state,
@@ -35,7 +42,7 @@ const studentSlice = createSlice({
         }, 
     }
 })
-export const {addStudent,removeStudent,addProject,setAllStudents} = studentSlice.actions;
+export const {setStudentInfo, addStudent, removeStudent, addProject, setAllStudents} = studentSlice.actions;
 
 export default studentSlice.reducer;
 

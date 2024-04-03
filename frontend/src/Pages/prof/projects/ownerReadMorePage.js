@@ -1,5 +1,5 @@
 import React from 'react';
-import Specificproject from '../layouts/professor/readmore';
+import Specificproject from './ownerReadMoreComponent.js';
 import Header from '../../../components/mainPagesHeader.js';
 
 const OwnerReadMore = () => {

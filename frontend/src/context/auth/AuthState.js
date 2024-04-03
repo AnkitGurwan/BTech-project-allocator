@@ -1,5 +1,7 @@
 import { useState } from "react";
 import AuthContext from "./AuthContext";
+import { setStudentInfo } from "../../Redux/student/studentSlice";
+import { useDispatch } from "react-redux";
 
 
 const AuthState = (props) => {
@@ -7,6 +9,7 @@ const AuthState = (props) => {
     //states define for auth
     const [user,setUser]=useState([])
     const [interest,setInterest]=useState([])
+    const dispatch = useDispatch();
 
     //local backend url for testing
     const url = 'http://localhost:5000';
@@ -88,24 +91,19 @@ const AuthState = (props) => {
     }
 
 
-    const getUserDetailsFromMicrosoft = async (code) => {
-        const response = await fetch(`${url}/auth/microsoft/getToken`, {
+    const getUserDetailsFromMicrosoft = async () => {
+        const response = await fetch(`${url}/auth/microsoft/getInfo`, {
             method: 'GET',
+            credentials:'include',
             headers: {
-                'Content-Type': "application/json",
-                'Code': code
+                'Content-Type': "application/json"
             }
         });
 
         const json = await response.json();
-        console.log("stud",json.studInformation)
 
-        //save user details in local storage
-        localStorage.setItem('studName', json.studInformation.givenName);
-        localStorage.setItem('studId', json.studInformation.mail);
-        localStorage.setItem('studRoll', json.studInformation.surname);
-        localStorage.setItem('studJob', json.studInformation.jobTitle);
-        localStorage.setItem('accessToken', json.accessToken);
+        dispatch(setStudentInfo(json));
+        return response.status;
     }
 
     const LogOut = async () => {

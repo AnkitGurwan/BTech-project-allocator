@@ -13,8 +13,8 @@ const StudentState = (props) => {
 
 
     //check student is alloted project or not
-    const checkStudentAlloted = async ( email ) => {
-        const response = await fetch(`${url}/student/checkAlloted/${email}`, {
+    const checkStudentAlloted = async ( userEmail ) => {
+        const response = await fetch(`${url}/student/checkAlloted/${userEmail}`, {
             method: 'GET',
             credentials:'include',
             headers: {
@@ -33,15 +33,16 @@ const StudentState = (props) => {
 
 
     //create a new student
-    const createStudent = async (userEmail,userName,userRoll) => {
+    const createStudent = async (userEmail, userName, userRoll) => {
         const response = await fetch(`${url}/student/newstudent`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ userEmail,userName,userRoll})
+            body: JSON.stringify({ userEmail, userName, userRoll})
         });
-        
+        const json = await response.json();
+        console.log("A",json)
         return response.status;
     };
 
@@ -53,7 +54,8 @@ const StudentState = (props) => {
             }
         })
         const json = await response.json();
-        return json;
+        console.log("json",json)
+        return json.ans;
     }
 
     const increaseStepDone = async ( email ) => {
@@ -80,10 +82,22 @@ const StudentState = (props) => {
         localStorage.removeItem('studName');
         localStorage.removeItem('studRoll');
     }
+
+    const checkStudentEligible = ( roll ) => {
+        if (
+            `${process.env.REACT_APP_ROLL_LOW}` <= roll &&
+            roll <= `${process.env.REACT_APP_ROLL_HIGH}`
+        ) {
+            return true;
+        } 
+        else {
+            return false;
+        }
+    }
     
         
     return (
-        <StudentContext.Provider value={{LogOut,createStudent, checkStudentAlloted, findStepDone, increaseStepDone}}>
+        <StudentContext.Provider value={{LogOut,createStudent, checkStudentAlloted, findStepDone, increaseStepDone, checkStudentEligible}}>
             {props.children}
         </StudentContext.Provider>
     )
