@@ -1,9 +1,13 @@
 import React from "react";
 import StudentContext from "./StudentContext";
+import { setAllStudents } from "../../Redux/student/studentSlice"
+import { useDispatch } from "react-redux";
 var _ = require('lodash');
 
 
 const StudentState = (props) => {
+
+    const dispatch = useDispatch();
 
     //local backend url for testing
     const url = 'http://localhost:5000';
@@ -42,7 +46,7 @@ const StudentState = (props) => {
             body: JSON.stringify({ userEmail, userName, userRoll})
         });
         const json = await response.json();
-        console.log("A",json)
+        
         return response.status;
     };
 
@@ -54,7 +58,6 @@ const StudentState = (props) => {
             }
         })
         const json = await response.json();
-        console.log("json",json)
         return json.ans;
     }
 
@@ -68,9 +71,31 @@ const StudentState = (props) => {
 
         return response.status;
     }
+
+
+    const getAllStudent = async ()=>{     
+        const response = await fetch(`${url}/student/allstudents`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': "application/json"
+                }
+            })   
+        const json=await response.json()
+        dispatch(setAllStudents(json));
+        
+       return json;
+    };
     
 
     const LogOut = async () => {
+        const response = await fetch(`${url}/auth/microsoft/logout`,{
+            method: 'GET',
+            credentials:'include',
+            headers: { 
+                'Context-Type': 'application/json'
+            }
+        })
+
         const tenantID = process.env.MICROSOFT_GRAPH_TENANT_ID;
         const logoutEndpoint = `https://login.microsoftonline.com/${tenantID}/oauth2/v2.0/logout?post_logout_redirect_uri=${process.env.REACT_APP_FRONTEND_URL}`;
         window.location.href = logoutEndpoint;
@@ -94,10 +119,23 @@ const StudentState = (props) => {
             return false;
         }
     }
+
+    //send feedback
+    const sendFeedback = async (email, header,body)=>{
+        const response = await fetch(`${url}/user/feedback`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, header, body }),
+        });
+        
+        return response.status;
+    }
     
         
     return (
-        <StudentContext.Provider value={{LogOut,createStudent, checkStudentAlloted, findStepDone, increaseStepDone, checkStudentEligible}}>
+        <StudentContext.Provider value={{LogOut,createStudent, checkStudentAlloted, findStepDone, increaseStepDone, checkStudentEligible, sendFeedback, getAllStudent}}>
             {props.children}
         </StudentContext.Provider>
     )

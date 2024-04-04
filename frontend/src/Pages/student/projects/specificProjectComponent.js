@@ -17,7 +17,7 @@ import StudentContext from "../../../context/student/StudentContext";
 const SpecificProjectComponent = () => {
 
     // get context
-    const { details, getInterestedStudents, allProjects} = useContext(ProjectContext);
+    const { details, getInterestedStudents, allProjects, getOwnerDetails} = useContext(ProjectContext);
     const { checkStudentEligible } = useContext(StudentContext);
     const { getUserDetailsFromMicrosoft, StudentMicrosoftLogin } = useContext(AuthContext);
 
@@ -76,6 +76,9 @@ const SpecificProjectComponent = () => {
     useEffect(() => {
       //check the user is allowed to use the website
       checkStudentAllowed();
+
+      getItem();
+      
   }, [random]);
 
     const getItem = async () => {
@@ -88,13 +91,10 @@ const SpecificProjectComponent = () => {
       //get all projects
       await allProjects();
 
+      await getOwnerDetails(id);
+
       if(x === 200)setLoading(false);    
     }
-
-    useEffect(()=>{
-      getItem();
-    },[]);
-
 
     
     

@@ -15,7 +15,7 @@ const AllProjectsComponent = () => {
     //context apis
     const { allProjects } = useContext(ProjectContext);
     const { getUserDetailsFromMicrosoft, StudentMicrosoftLogin } = useContext(AuthContext);
-    const { createStudent, checkStudentAlloted, findStepDone, LogOut, checkStudentEligible } = useContext(StudentContext);
+    const { createStudent, checkStudentAlloted, findStepDone, LogOut, checkStudentEligible, getAllStudent } = useContext(StudentContext);
     
     //react states
     const [mobileMenu, setMobileMenu] = useState(false);
@@ -27,6 +27,9 @@ const AllProjectsComponent = () => {
     const [flag, setFlag] = useState(false);
     const [random, setRandom] = useState(false);
 
+    const [allotedProjects, setAllotedProjects] = useState([]);
+    const [unAllotedProjects, setUnAllotedProjects] = useState([]);
+
 
     //get details from redux store
     const items = useSelector((state) => state.allProjects.allProjects);
@@ -34,8 +37,20 @@ const AllProjectsComponent = () => {
     const studentInfo = useSelector((state) => state.student.studentInfo);
 
 
+    const sortProjects = () => {
+        if(items)
+        {
+            const allotedProjects = items.filter((item) => item.allotedPeople.length > 0);
+            const unAllotedProjects = items.filter((item) => item.allotedPeople.length === 0);
 
-    const getItem = async () => {console.log("yu")
+            setAllotedProjects(allotedProjects)
+            setUnAllotedProjects(unAllotedProjects)
+        }
+    }
+
+
+
+    const getItem = async () => {
         
         //get all items
         await allProjects();
@@ -51,7 +66,7 @@ const AllProjectsComponent = () => {
             
             if(x === 202) //already registered
             {
-                checkRegistered();
+                checkAllotedFunc();
             }
         }
     };
@@ -92,7 +107,7 @@ const AllProjectsComponent = () => {
         }
     };
 
-    const checkRegistered = async () => {
+    const checkAllotedFunc = async () => {
         // using email to check user is registered to project or not
         if (studentInfo && studentInfo.studInfo)
         {
@@ -107,20 +122,29 @@ const AllProjectsComponent = () => {
             else if(x === 401)
             {
                 await LogOut();
-                toast.success('Session Expired, Please Login again', {
-                    position: toast.POSITION.TOP_CENTER
-                });
+                // toast.success('Session Expired, Please Login again', {
+                //     position: toast.POSITION.TOP_CENTER
+                // });
             }
         }
     }
 
 
     useEffect(() => {
-        getPartner();
-
+        
         //check the user is allowed to use the website
         checkStudentAllowed();
+
+        //handler steps
         handlerNextWork();
+
+        //handler sorting of projects
+        sortProjects();
+
+        //get all students. Students will be stored in react redux store
+        getAllStudent();
+
+        getPartner();
         
         getItem();
     }, [random]);
@@ -128,23 +152,26 @@ const AllProjectsComponent = () => {
     
 
     const getPartner = () => {
-        const partnerId = students.filter((student) => student.email === studentInfo.studInfo.mail).map((student, i) => {
-            return student._id;
-        });
-
-        var flag = false;
-        const partner = students
-            .filter((student) => student.partner === partnerId[0])
-            .map((student, i) => {
-            flag = true;
-            return student;
+        if (students && studentInfo && studentInfo.studInfo)
+        {
+            const studId = students.filter((student) => student.email === studentInfo.studInfo.mail).map((student, i) => {
+                return student._id;
             });
 
-        setFlag(flag);
-        setPartner(partner);
+            var flag = false;
+
+            const partner = students
+                .filter((student) => student.partner === studId[0])
+                .map((student, i) => {
+                    flag = true;
+                    return student;
+                });
+
+            setFlag(flag);
+            setPartner(partner);
+        }
     }
   
-    const userName = localStorage.getItem('studName');
 
     const [search, setSearch] = useState('');
     const detectChanges = async (e) => {
@@ -229,9 +256,10 @@ const AllProjectsComponent = () => {
                                 </div>
                                 }
             
-                                {!registered 
-                                ?
+                                
                                 <div className='hidden md:flex'>
+                                    {!registered 
+                                    ?
                                     <div
                                         className="text-gray-500 px-3 py-2 rounded-md text-xl font-x-large"
                                     >
@@ -240,18 +268,7 @@ const AllProjectsComponent = () => {
                                         ></i>
                                         My Project
                                     </div>
-                                    <div
-                                        className="text-gray-500  px-3 py-2 rounded-md text-xl font-x-large"
-                                        style={{ textDecoration: "none" }}
-                                    >
-                                        <i
-                                        className="fa-solid fa-user text-md pr-1"
-                                        ></i>
-                                        My Partner
-                                    </div>
-                                </div>
-                                :
-                                <div className='hidden md:flex'>
+                                    :
                                     <Link
                                         to={`/btp/student/projects/${projectId}`}
                                         className="text-gray-400 hover:text-white px-3 py-2 rounded-md text-lg font-x-large"
@@ -260,7 +277,9 @@ const AllProjectsComponent = () => {
                                         className="fa-solid fa-book text-md pr-1"
                                         ></i>
                                         My Project
-                                    </Link>
+                                    </Link>}
+                                    {flag
+                                    ?
                                     <a
                                         href='#partner'
                                         className="text-gray-400 hover:text-white px-3 no-underline py-2 rounded-md text-lg font-x-large z-10 cursor-pointer"
@@ -270,8 +289,18 @@ const AllProjectsComponent = () => {
                                         ></i>
                                         My Partner
                                     </a>
+                                    :
+                                    <div
+                                        className="text-gray-500  px-3 py-2 rounded-md text-xl font-x-large"
+                                        style={{ textDecoration: "none" }}
+                                    >
+                                        <i
+                                        className="fa-solid fa-user text-md pr-1"
+                                        ></i>
+                                        My Partner
+                                    </div>}
                                 </div>
-                                }
+                                
                                 <a
                                     href='#course'
                                     className="hidden md:flex text-gray-400 hover:text-white px-2 md:px-3 py-2 rounded-md text-xs  md:text-lg"
@@ -369,7 +398,7 @@ const AllProjectsComponent = () => {
                         <p>No description provided.</p>
                         <div className="container"></div>
                     </div>
-                    <div className="rounded-md mt-4 ml-4 md:p-2 md:ml-12 w-2/3 md:w-1/3 bg-gray-100 p-2 text-gray-600" style={{'fontFamily':'Manrope'}}>
+                    <div className="rounded-md my-4 ml-4 md:p-2 md:ml-12 w-2/3 md:w-1/3 bg-gray-100 p-2 text-gray-600" style={{'fontFamily':'Manrope'}}>
                         <div className="caption titled text-sm md:text-lg font-bold">
                         → Pay attention
                         <div className="top-links"></div>
@@ -383,9 +412,14 @@ const AllProjectsComponent = () => {
                         </div>
                         </div>
                     </div>
+
+                    <hr/>
         
-                    <div className='grid grid-cols-2 gap-2 md:gap-4 mt-16 mx-2 md:mx-6 md:grid-cols-3 lg:grid-cols-5'>
-                        {items
+                    <div className='w-full flex justify-start py-4 px-8 text-white text-xl'>
+                        <div className='px-4 py-2 rounded-md w-fit bg-green-600 bg-opacity-80'>Not Alloted till now ({unAllotedProjects.length})</div>
+                    </div>
+                    <div className='grid grid-cols-2 gap-2 md:gap-4 pt-4 pb-2 px-2 md:px-6 md:grid-cols-3 lg:grid-cols-5'>
+                        {unAllotedProjects
                         .filter((items) => {
                             return search.toString().toLowerCase() === ""
                             ? items
@@ -395,6 +429,25 @@ const AllProjectsComponent = () => {
                             return <Projectcard key={i} project={project} />;
                         })}
                     </div>
+
+                    <hr/>
+
+                    <div className='w-full flex justify-start py-4 px-8 text-white text-xl'>
+                        <div className='px-4 py-2 rounded-md w-fit bg-red-600 bg-opacity-80'>Alloted Projects ({allProjects.length})</div>
+                    </div>
+                    <div className='grid grid-cols-2 gap-2 md:gap-4 pt-4 pb-2 px-2 md:px-6 md:grid-cols-3 lg:grid-cols-5'>
+                        {allotedProjects
+                        .filter((items) => {
+                            return search.toString().toLowerCase() === ""
+                            ? items
+                            : items.title.toLowerCase().includes(search.toLocaleLowerCase());
+                        })
+                        .map((project, i) => {
+                            return <Projectcard key={i} project={project} />;
+                        })}
+                    </div>
+
+                    <hr/>
         
                     <div id='partner' className="mx-auto pt-24 pb-12 text-gray-600">
                         <div className="max-w-md mx-auto shadow-md rounded-md bg-gray-100">
@@ -470,7 +523,7 @@ const AllProjectsComponent = () => {
                         We value your opinion, please take a moment to fill out our{" "}
                         <Link
                             className='px-1 text-blue-500 hover:underline'
-                            to={`/studfeedback`}
+                            to={`/btp/student/feedback`}
                         >
                             {" "}
                             feedback form{" "}

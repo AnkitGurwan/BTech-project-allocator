@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from 'react-redux';
 import { setSpecificProjects, setAllProjectsRedux, delProject, addProject, setInterestedStudents } from "../../Redux/allProjects/allprojectsSlice";
-import { setAllStudents } from "../../Redux/student/studentSlice"
 import ItemContext from "./ProjectContext";
 var _ = require('lodash');
 
@@ -106,20 +105,22 @@ const ItemState=(props)=>{
             return response.status;
     };
 
-    const selectproject = async (id, accessToken)=>{       
-            const response = await fetch(`${url}/project/projectaddition/${id}/${accessToken}`,  {
+    const selectproject = async ( email, id )=>{       
+            const response = await fetch(`${url}/project/selectProject/${id}/${email}`,  {
                 method: 'GET',
                 credentials:'include',
                 headers: {
                     'Content-Type': "application/json"
                 }
             })
-            return response.status
+            return response.status;
     };
+    
 
     const allotProject = async (id,user,friend)=>{   
             const response = await fetch(`${url}/project/allotProject/${id}/${user}/${friend}`,  {
                 method: 'GET',
+                credentials:'include',
                 headers: {
                     'Content-Type': "application/json"
                 }
@@ -128,9 +129,10 @@ const ItemState=(props)=>{
     };
 
 
-    const deselectproject = async(id, accessToken)=>{       
-            const response = await fetch(`${url}/project/deselectproject/${id}/${accessToken}`,  {
+    const deselectproject = async(email, id)=>{       
+            const response = await fetch(`${url}/project/deselectproject/${id}/${email}`,  {
                 method: 'GET',
+                credentials:'include',
                 headers: {
                     'Content-Type': "application/json"
                 }
@@ -139,7 +141,7 @@ const ItemState=(props)=>{
     };
         
 
-    const ownerdetails = async( id )=>{          
+    const getOwnerDetails = async( id )=>{          
             const response = await fetch(`${url}/project/ownerdetails/${id}`, {
                     method: 'GET',
                     headers: {
@@ -160,26 +162,13 @@ const ItemState=(props)=>{
                         'Content-Type': "application/json"
                     }
                 })            
-            const json=await response.json();
+            const json = await response.json();
 
             dispatch(setInterestedStudents(json));   
 
             return response.status;
     };
 
-
-    const getAllStudent = async()=>{     
-            const response = await fetch(`${url}/project/getallstudent`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': "application/json"
-                    }
-                })   
-            const json=await response.json()
-            dispatch(setAllStudents(json));
-            
-           return json;
-    };
 
     const getSingleProject = async(id)=>{
         const response = await fetch(`${url}/project/projectSpecific/${id}`, {
@@ -195,7 +184,7 @@ const ItemState=(props)=>{
     
         
     return (
-        <ItemContext.Provider value={{details, getAllStudent, allProjects,allProjectsState,createProject,updateProject,deleteProject,selectproject,deselectproject,ownerdetails,Projectspecific,itemsspecific,getSingleProject,single, getInterestedStudents,allotProject}}>
+        <ItemContext.Provider value={{details, allProjects,allProjectsState,createProject,updateProject,deleteProject,selectproject,deselectproject,getOwnerDetails,Projectspecific,itemsspecific,getSingleProject,single, getInterestedStudents,allotProject}}>
             {props.children}
         </ItemContext.Provider>
     )
