@@ -9,5 +9,5 @@ const userSchema = new mongoose.Schema({
     is_admin: { type: Boolean, required: false, default: false }
 });
 
-const User = mongoose.model("Professor", userSchema);
+const User = mongoose.model("User", userSchema);
 export default User;
