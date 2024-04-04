@@ -8,8 +8,7 @@ import { useSelector } from 'react-redux';
 const SpecificProjectProjectcard = () =>{
   
     //context info fetch
-    const {selectproject, deselectproject, ownerdetails, getInterestedStudents } = useContext(ProjectContext);
-    const [itemData, setItemData] = useState({ name: "", partnerId: "", partnerRoll: "", isbanned: false })
+    const {selectproject, deselectproject, getInterestedStudents } = useContext(ProjectContext);
     
 
     //defined states
@@ -19,12 +18,15 @@ const SpecificProjectProjectcard = () =>{
     const [alloted, setAlloted] = useState(false);
     const [showModal, setShowModal] = useState(false);
 
-    const params=useParams();
-    const id=params.id;
+
+    //get project id from params
+    const params = useParams();
+    const id = params.id;
 
     //redux info fetch
     const items = useSelector(state => state.allProjects.allProjects);
     const project = items.filter((project)=>project._id === id).map((project,i)=>{return project});
+    const studentInfo = useSelector((state) => state.student.studentInfo);
 
 
     //check if user has registered for the project or not
@@ -46,9 +48,6 @@ const SpecificProjectProjectcard = () =>{
 
     const getItem = async () => {
 
-      //get prof details
-      await ownerdetails(id);
-
       //get single project
       const x = project;
 
@@ -65,93 +64,92 @@ const SpecificProjectProjectcard = () =>{
     },[]);
 
 
-    const onChangeHandler = (e) => {
-      (setItemData({...itemData,[e.target.name]:e.target.value}));
-    }
+    const registerProject = async (e) => {
+        e.preventDefault();
 
-    //partner details
-    const user1email = localStorage.getItem('studId');
-    const user2email = itemData.partnerId;
+        const x = await selectproject( studentInfo.studInfo.mail, id);
+        alert(x)
 
-
-    const submit = async (e) => {
-          e.preventDefault();
-          
-          if(document.getElementById("myBtn").innerText==="Register"){
-          const x=await selectproject(id,localStorage.getItem('accessToken'),user2email);
-
-          alert(x)
-          //check
-          if(x === 200){
+        //check
+        if(x === 200){
             toast.success('Registered Successfully', {
-              position: toast.POSITION.TOP_CENTER
-          });
-            await getInterestedStudents(id);
-            setIsRegistered(1);
-            document.getElementById("myBtn").className="projectcardlink2230a";
-            document.getElementById("myBtn").innerText="De-Register"; 
-            
-          }
-          else if(x === 403)
-            {
-              document.getElementById('myButton').classList.remove('animate-pulse');
-              toast.error('Given Id does not exist. Please ask your "Partner" to login to website once before Register.', {
-                position: toast.POSITION.TOP_CENTER
+              position: 'top-center'
             });
-            }
-            else if(x === 350)
-            {
-              toast.error('Please Select A Partner.', {
-                position: toast.POSITION.TOP_CENTER
-            });
-            }
-          else if(x === 400)
-            {
-              document.getElementById('myButton').classList.remove('animate-pulse');
-              toast.error('Already Registered', {
-                position: toast.POSITION.TOP_CENTER
-            });
-          }
-
-        else if(x === 401)
-          {
-            document.getElementById('myButton').classList.remove('animate-pulse');
-            toast.error('You have already Registered for a project', {
-              position: toast.POSITION.TOP_CENTER
-          });
-          }
-          }
-            //already registered
-            else { 
-              const x=await deselectproject(id,user);
-              //check
-              if(x===200){
-                document.getElementById('myButton').classList.remove('animate-pulse');
-                setIsRegistered(0);
-              
-                toast.success('De-Registered', {
-                  position: toast.POSITION.TOP_CENTER
-              });          
-                document.getElementById("myBtn").className="projectcardlink223";
-                document.getElementById("myBtn").innerText="Register"; 
+            setIsRegistered(1); 
+          
         }
-            if(x===400)
-            {
-              document.getElementById('myButton').classList.remove('animate-pulse');
-              toast.error('No Project Alloted Yet.', {
-                position: toast.POSITION.TOP_CENTER
+        else if(x === 401)
+        {
+              toast.error('Please choose your partner before registering.', {
+                position: 'top-center'
+              });
+        }
+        else if(x === 402)
+        {
+            toast.error('Project already alloted to a group.', {
+              position: 'top-center'
+          });
+        }
+        else if(x === 403)
+          {
+              toast.error('You have already been alloted a project.', {
+                position: 'top-center'
+              });
+        }
+        else if(x === 404)
+          {
+              toast.error('You partner is already been alloted a project.', {
+                position: 'top-center'
+              });
+        }
+
+        else if(x === 500)
+        {
+            toast.error('Server error. Kindly contact the admin', {
+              position: 'top-center'
             });
-            }
-      
-            if(x === 401)
-            {
-              document.getElementById('myButton').classList.remove('animate-pulse');
-              toast.error('This Project is not alloted to you.', {
-                position: toast.POSITION.TOP_CENTER
-            });
-            }
-          }   
+        }
       }
+
+
+    const deRegisterProject = async (e) => {
+        e.preventDefault();
+
+        const x = await deselectproject( studentInfo.studInfo.mail, id);
+
+        //check
+        if(x === 200){
+            toast.success('De-Registered Successfully', {
+              position: 'top-center'
+            });
+            setIsRegistered(1); 
+          
+        }
+        else if(x === 401)
+        {
+              toast.error('Project is not alloted yet.', {
+                position: 'top-center'
+            });
+        }
+        else if(x === 402)
+        {
+              toast.error('You are not registered. Kindly contact admin', {
+                position: 'top-center'
+            });
+        }
+        else if(x === 403)
+        {
+              toast.error('You cannot de-register after the project is alloted to you.', {
+                position: 'top-center'
+            });
+        }
+        else if(x === 500)
+        {
+            toast.error('Server error. Kindly contact the admin', {
+              position: 'top-center'
+          });
+        }
+    }
 
     const click = () => {
         setShowModal(true);
@@ -160,7 +158,7 @@ const SpecificProjectProjectcard = () =>{
 
     return(
         <div className='w-full px-2' style={{'fontFamily':'Manrope'}}>
-          <div className="div-3 rounded-lg border-2 bg-gray-100">
+          <div className="p-3 rounded-lg border-2 bg-gray-100">
             <div className="py-1">
                 <div className="flex items-center justify-center font-Manrope tracking-tight leading-5 text-lg md:text-xl bg-gray-300 rounded-sm py-2 font-semibold md:font-bold">
                   <i className="fa-solid fa-book text-xl px-2"></i>
@@ -236,63 +234,43 @@ const SpecificProjectProjectcard = () =>{
                 {isRegistered === 1
                   ?
                   <div id="myModal" className="fixed top-12 left-20">
-                      <div className="modal-content">
+                      <div className="flex">
                         <span className="close">&times;</span>
                         
                         <div 
                           id='myButton' 
-                          className='modalp text-lg'
+                          className='text-lg'
                         >
                             Are you sure you want to De-register? 
-                            <Link 
+                            <div 
                               className='flex justify-center items-center no-underline w-32 rounded-md text-white div-1 font-medium' 
                               style={{'backgroundColor':'#EC2D01'}} 
-                              onClick={submit}
                             >
                                 De-Register
-                            </Link>
-                          </div>
+                            </div>
+                        </div>
                       </div>
                     </div>
                     :
                     <div id="myModal" className="z-10 fixed top-1/4 left-1/3 w-full h-full">
-                      <div className="px-4 pt-1 pb-3 rounded-md bg-gray-200 w-1/3 border border-gray-300 border-opacity-40 shadow-md">
+                      <div className="p-6 pt-2 rounded-md bg-gray-200 w-fit border border-gray-300 border-opacity-40 shadow-lg">
                         <span 
-                          className="pt-1 pr-2 text-4xl flex justify-end"
+                          className="text-3xl flex justify-end"
                         >
-                          <div className='cursor-pointer text-gray-600' onClick={() => {setShowModal(false)}}>&times;</div>
+                          <div className='cursor-pointer text-gray-600 text-4xl' onClick={() => {setShowModal(false)}}>&times;</div>
                         </span>
-                        <form className="w-full mx-auto mb-3" onSubmit={submit}>
-                          <div className="mb-8">
-                            <label 
-                              className="text-gray-600 text-sm font-bold mb-2 md:mb-4 flex justify-content-start items-center" for="confirm-password">
-                                Partner Outlook id 
-                                <div className='px-1 font-medium'>
-                                  (including @iitg.ac.in)
-                                </div>
-                            </label>
-                            <input
-                              className="appearance-none border text-sm rounded w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
-                              id="confirm-password"
-                              type="email"
-                              placeholder="Outlook id"
-                              name="partnerId"
-                              onChange={onChangeHandler}
-                              value={itemData.partnerId}
-                              required
-                            />
-                          </div>
-                          
-                          <div className="flex items-center justify-center">
-                            <button 
-                              id='myButton' 
-                              className="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded w-100" 
-                              type="submit">
+                        <div 
+                          id='myButton' 
+                          className='flex items-center text-lg pt-4 gap-3'
+                        >
+                            Are you sure you want to Register? 
+                            <Link 
+                              className='flex justify-center items-center no-underline w-fit px-3 py-1 rounded-md text-white div-1 font-medium bg-yellow-600 hover:bg-yellow-700' 
+                              onClick={registerProject}
+                            >
                                 Register
-                            </button>
-
+                            </Link>
                           </div>
-                        </form>
                       </div>
                     </div>
                   } 
