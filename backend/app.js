@@ -37,6 +37,9 @@ app.use('/project',ProjectRouter);
 import StudentRouter from "./Views/student.js";
 app.use('/student',StudentRouter);
 
+import UserRouter from "./Views/user.js";
+app.use('/user',UserRouter);
+
 app.listen(process.env.PORT, (req, res, err) => {
     if(err){
         console.log(err);

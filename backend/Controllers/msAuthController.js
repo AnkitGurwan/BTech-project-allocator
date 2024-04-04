@@ -148,3 +148,19 @@ export const getInfo = async (req, res) => {
     
   };
 
+
+export const logOut = async (req, res) => {
+  try{
+
+    // Clear the cookie named 'btp_student_accessToken'
+    res.clearCookie('btp_student_accessToken', { httpOnly: true, secure: true });
+    
+    // Redirect the user to the login page or any other appropriate route
+    res.status(201).json({ msg : "Logged out successfully"});
+  }
+  catch(err) {
+    res.status(500).json({msg : err.message});
+  }
+    
+  };
+

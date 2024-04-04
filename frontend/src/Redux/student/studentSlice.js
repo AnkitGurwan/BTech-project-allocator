@@ -34,7 +34,6 @@ const studentSlice = createSlice({
             state.specificProjects.slice(index, 1);
         }, 
         setAllStudents(state,action){
-            console.log("hiii guys")
             return {
                 ...state,
                 allStudents: action.payload

@@ -20,7 +20,7 @@ const Projectcard = (props) => {
                         </div>
                     </h5>
                     
-                    <p className="pb-0 md:pb-4 text-xs md:text-sm px-2 pt-2 text-center">
+                    <div className="pb-0 md:pb-4 text-xs md:text-sm px-2 pt-2 text-center">
                         {project.brief_abstract.slice(0,120)}
                         <Link 
                             to={project._id} 
@@ -28,15 +28,15 @@ const Projectcard = (props) => {
                         >
                             ...read more
                         </Link>
-                    </p>
-                    <p className="text-xs md:text-sm pb-2 flex-col items-center">
+                    </div>
+                    <div className="text-xs md:text-sm pb-2 flex-col items-center">
                         <h6 className='m-0 text-xs md:text-sm font-medium'>
                             Specialization
                         </h6>
                         <div className='text-xs md:text-sm pb-0'>
                             {project.specialization}
                         </div>
-                    </p>
+                    </div>
                     <h6 className="text-xs md:text-sm pt-1 text-center">
                         {project.creation_date} 
                     </h6>
