@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
 import ProjectContext from '../../../context/project/ProjectContext';
-import StudentContext from '../../../context/student/StudentContext'
+import StudentContext from '../../../context/student/StudentContext';
 import Projectcard from './allProjectsProjectcard.js';
 import AuthContext from '../../../context/auth/AuthContext';
 import CourseStructure from './courseStructure.js';
@@ -290,15 +290,15 @@ const AllProjectsComponent = () => {
                                         My Partner
                                     </a>
                                     :
-                                    <div
-                                        className="text-gray-500  px-3 py-2 rounded-md text-xl font-x-large"
-                                        style={{ textDecoration: "none" }}
+                                    <Link
+                                        to={`/btp/student/partner`}
+                                        className="text-gray-400 hover:text-white px-3 py-2 rounded-md text-lg font-x-large"
                                     >
                                         <i
                                         className="fa-solid fa-user text-md pr-1"
                                         ></i>
                                         My Partner
-                                    </div>}
+                                    </Link>}
                                 </div>
                                 
                                 <a

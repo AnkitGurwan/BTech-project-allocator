@@ -1,6 +1,6 @@
-import React from "react";
+import React, {useState} from "react";
 import StudentContext from "./StudentContext";
-import { setAllStudents } from "../../Redux/student/studentSlice"
+import { setAllStudents, setPartnerRequestsRedux, setSentRequestsRedux } from "../../Redux/student/studentSlice"
 import { useDispatch } from "react-redux";
 var _ = require('lodash');
 
@@ -47,6 +47,62 @@ const StudentState = (props) => {
         });
         const json = await response.json();
         
+        return response.status;
+    };
+
+    const addPartner = async ( student, partner ) => {
+        const response = await fetch(`${url}/student/partner/${student}/${partner}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const json = await response.json();
+        
+        return response.status;
+    };
+
+    const finalPartner = async ( student, partner ) => {
+        const response = await fetch(`${url}/student/finalpartner/${student}/${partner}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const json = await response.json();
+        
+        return response.status;
+    };
+
+    const partnerRequest = async (email) => {
+        const response = await fetch(`${url}/student/partnerrequest/${email}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': "application/json"
+            }
+        });
+        const json = await response.json();
+
+
+        //save details in react state and redux
+        dispatch(setPartnerRequestsRedux(json));
+
+        return response.status;
+    };
+
+    const sentRequest = async (email) => {
+        const response = await fetch(`${url}/student/sentrequest/${email}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': "application/json"
+            }
+        });
+        const json = await response.json();
+
+
+        //save details in react state and redux
+        dispatch(setSentRequestsRedux(json));
+
         return response.status;
     };
 
@@ -135,7 +191,7 @@ const StudentState = (props) => {
     
         
     return (
-        <StudentContext.Provider value={{LogOut,createStudent, checkStudentAlloted, findStepDone, increaseStepDone, checkStudentEligible, sendFeedback, getAllStudent}}>
+        <StudentContext.Provider value={{LogOut,createStudent, addPartner, finalPartner, partnerRequest, sentRequest, checkStudentAlloted, findStepDone, increaseStepDone, checkStudentEligible, sendFeedback, getAllStudent}}>
             {props.children}
         </StudentContext.Provider>
     )
