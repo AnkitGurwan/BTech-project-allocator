@@ -6,13 +6,27 @@ const initialState = {
     intrestedPeople:[],
     partnerDetails:"",
     studentProject:"",
-    allStudents:[]
+    allStudents:[],
+    partnerRequests:[],
+    sentRequests:[],
 }
 
 const studentSlice = createSlice({
     name:"student",
     initialState,
     reducers:{
+        setPartnerRequestsRedux(state,action){
+            return {
+                ...state,
+                partnerRequests: action.payload
+              };
+        },
+        setSentRequestsRedux(state,action){
+            return {
+                ...state,
+                sentRequests: action.payload
+              };
+        },
         setStudentInfo(state,action){
             return {
                 ...state,
@@ -41,7 +55,7 @@ const studentSlice = createSlice({
         }, 
     }
 })
-export const {setStudentInfo, addStudent, removeStudent, addProject, setAllStudents} = studentSlice.actions;
+export const {setStudentInfo, addStudent, removeStudent, addProject, setAllStudents, setPartnerRequestsRedux, setSentRequestsRedux} = studentSlice.actions;
 
 export default studentSlice.reducer;
 
