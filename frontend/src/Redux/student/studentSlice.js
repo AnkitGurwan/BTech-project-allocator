@@ -12,7 +12,7 @@ const initialState = {
 }
 
 const studentSlice = createSlice({
-    name:"student",
+    name: "student",
     initialState,
     reducers:{
         setPartnerRequestsRedux(state,action){
