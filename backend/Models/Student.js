@@ -17,7 +17,9 @@ const studentSchema = new mongoose.Schema({
     partner_name: { type: String, default: "" },
     stepsDone:  { type: Number, default: 0},
     gradeCardUrl: { type: String, default: ""},
-    resumeUrl: { type: String, default: ""}
+    resumeUrl: { type: String, default: ""},
+    receivedRequests: { type: Array, default: [] },
+    pendingRequests: { type: Array, default: [] },
 });
 
 const Student = mongoose.model("Student", studentSchema);

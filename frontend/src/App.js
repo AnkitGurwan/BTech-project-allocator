@@ -12,6 +12,7 @@ import Interface from './Pages/interface.js';
 import Proflogin from './Pages/prof/auth/profAuth.js';
 import Studentlogin from './Pages/student/auth/studentAuth.js';
 import StudentHome from './Pages/student/projects/allProjects.js';
+import PartnerHome from './Pages/student/others/partner.js';
 import StudentSpecificProject from './Pages/student/projects/specificProject.js';
 import ProfallProjectPage from './Pages/prof/projects/allProjectPage.js';
 import OwnerProjectPage from './Pages/prof/projects/ownerProjectPage.js';
@@ -59,11 +60,14 @@ const App = () => {
                               {/* student particular project page */}
                               <Route path='/btp/student/projects/:id' element={<StudentSpecificProject/>}/>
 
-                              {/* student feedback page */}
-                              <Route path='/btp/student/feedback' element={<StudentFeedback/>}/>
-                          </Routes>
-                      </BrowserRouter>
-                  </ProfState>
+                            {/* student partner find page */}
+                            <Route path='/btp/student/partner' element={<PartnerHome/>}/>
+
+                            {/* student feedback page */}
+                            <Route path='/btp/student/feedback' element={<StudentFeedback/>}/>
+                            </Routes>
+                        </BrowserRouter>
+                    </ProfState>
               </StudentState>
         </ItemState>
           
