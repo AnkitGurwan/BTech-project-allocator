@@ -21,6 +21,7 @@ import ProfReadMore from './Pages/prof/projects/ownerReadMorePage.js';
 import AllReadMore from './Pages/prof/projects/allReadMorePage.js';
 import StudentFeedback from './Pages/student/others/feedback.js'
 import ProfFeedback from './Pages/prof/others/feedback.js'
+import ProjectUpdate from "./Pages/prof/projects/updateProject.js"
 
 const App = () => {
   return (
@@ -50,6 +51,9 @@ const App = () => {
 
                 {/* prof feedback page */}
                 <Route path='/btp/prof/feedback' element={<ProfFeedback />} />
+
+                {/* project update page */}
+                <Route path='/btp/prof/owner/update/:id' element={<ProjectUpdate />} />
 
 
                 {/* student login page */}

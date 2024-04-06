@@ -276,7 +276,7 @@ const OwnerProjectsComponent = () => {
             ?
             <div>
               <div className="grid grid-cols-2 gap-2 md:gap-4 pt-4 pb-2 px-2 md:px-6 md:grid-cols-3 lg:grid-cols-5">
-                {items && items.length && items.filter(projects => {
+                {items && items.length > 0 && items.filter(projects => {
                     return search.toString().toLowerCase() === ''
                       ? projects
                       : projects.title.toLowerCase().includes(search.toLocaleLowerCase());
@@ -287,46 +287,46 @@ const OwnerProjectsComponent = () => {
               </div>
 
                 <div
-                        className="flex items-center pl-4 md:pl-24 lg:pl-48 bg-gray-200"
-                        style={{
-                            height: "15vh",
-                            width: "100vw",
-                            margin: "auto",
-                            display: "flex",
-                            alignprojects: "center",
-                        }}
-                    >
-                        <svg
-                        style={{ height: "30px", paddingRight: "10px" }}
-                        className="MuiSvgIcon-root _add__comment_1ob32_146"
-                        focusable="false"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                        >
-                        <path
-                            d="M22 4c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4zm-2 13.17L18.83 16H4V4h16v13.17zM13 5h-2v4H7v2h4v4h2v-4h4V9h-4z"
-                        ></path>
-                        </svg>
-                        <p
-                        className="_para__feedback_1ob32_130 text-xs md:text-sm lg:text-lg flex-wrap"
-                        style={{
-                            marginBottom: "0.5vw",
-                            display: "flex",
-                            alignContent: "center",
-                        }}
-                        hover={{ textDecoration: "underline" }}
-                        >
-                        We value your opinion, please take a moment to fill out our{" "}
-                        <Link
-                            className='px-1 text-blue-500 hover:underline'
-                            to={`/btp/prof/feedback`}
-                        >
-                            {" "}
-                            feedback form{" "}
-                        </Link>{" "}
-                        to help us improve.
-                        </p>
-                    </div>
+                  className="flex items-center pl-4 md:pl-24 lg:pl-48 bg-gray-200"
+                  style={{
+                      height: "15vh",
+                      width: "100vw",
+                      margin: "auto",
+                      display: "flex",
+                      alignprojects: "center",
+                  }}
+                  >
+                      <svg
+                      style={{ height: "30px", paddingRight: "10px" }}
+                      className="MuiSvgIcon-root _add__comment_1ob32_146"
+                      focusable="false"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      >
+                      <path
+                          d="M22 4c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4zm-2 13.17L18.83 16H4V4h16v13.17zM13 5h-2v4H7v2h4v4h2v-4h4V9h-4z"
+                      ></path>
+                      </svg>
+                      <p
+                      className="_para__feedback_1ob32_130 text-xs md:text-sm lg:text-lg flex-wrap"
+                      style={{
+                          marginBottom: "0.5vw",
+                          display: "flex",
+                          alignContent: "center",
+                      }}
+                      hover={{ textDecoration: "underline" }}
+                      >
+                      We value your opinion, please take a moment to fill out our{" "}
+                      <Link
+                          className='px-1 text-blue-500 hover:underline'
+                          to={`/btp/prof/feedback`}
+                      >
+                          {" "}
+                          feedback form{" "}
+                      </Link>{" "}
+                      to help us improve.
+                      </p>
+                  </div>
                 </div>
                 :
                 <div className="w-full flex justify-center mt-8 md:mt-20">

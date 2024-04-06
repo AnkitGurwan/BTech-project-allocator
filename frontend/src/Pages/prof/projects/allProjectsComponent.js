@@ -1,35 +1,36 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import ProjectContext from '../../../context/project/ProjectContext';
 import ProfContext from '../../../context/prof/ProfContext';
 import ProjectCard from './allProjectCard';
+
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useSelector } from 'react-redux';
 
 const OwnerProjectsComponent = () => {
-  const { allProjects, createProject } = useContext( ProjectContext );
+  const { allProjects, createProject} = useContext( ProjectContext );
   const { getProfDetailsFromMicrosoft } = useContext(ProfContext);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   
   const navigate = useNavigate();
-
   const [count, setCount] = useState(0);
+
 
   const items = useSelector((state) => state.allProjects.allProjects);
 
   const getItem = async () => {
+
     const x = await allProjects();
 
     if (x === 200) setLoading(false);
     else {
-      localStorage.clear('btpToken');
       toast.error('Your session has expired, please login again.', {
-        position: toast.POSITION.TOP_CENTER
+        position: 'top-center'
       });
-      navigate(`/login`);
+      navigate(`/btp/prof`);
     }
   };
 
@@ -98,13 +99,13 @@ const OwnerProjectsComponent = () => {
     e.preventDefault();
     const token = localStorage.getItem('btpToken');
     window.open(
-      `${process.env.REACT_APP_BACKEND_URL}/project/intrestedpeople/${token}`,
+      `${process.env.REACT_APP_BACKEND_URL}/project/interestedpeople/${token}`,
       '_blank'
     );
   };
   
   return (
-    <div class="w-full">
+    <div class="w-full overflow-x-hidden">
       <div class="w-full text-left">
         <nav class="shadow-md">
           <div class="mx-auto p-2">
@@ -181,6 +182,7 @@ const OwnerProjectsComponent = () => {
           </div>
         ) : (
           <div>
+            
             <div className="grid grid-cols-2 gap-2 md:gap-4 pt-4 pb-2 px-2 md:px-6 md:grid-cols-3 lg:grid-cols-5">
               {items
                 .filter(projects => {
