@@ -18,6 +18,87 @@ const getAllProjects = async (req, res) => {
     }
 };
 
+const extract_projects = async (projects_array) => {
+    var projects = [];
+
+    for (var i = 0; i < projects_array.length; i++) {
+        let project = await Project.findById(projects_array[i]).select("-password -seckey").lean();
+        projects.push(project);
+    }
+    return projects;
+}
+
+//get specific projects
+const getOwnerProjects = async (req, res) => {
+    try{
+        const email = req.params.email;
+
+        const user = await User.findOne({ email });
+    
+        if (!user) {
+            res.status(200).json({ msg: "User Not Found" });
+        } else {
+            const projects = user.projects_posted;
+            const projects_array = await extract_projects(projects);
+            res.status(200).json(projects_array);
+        }
+    }
+    catch(err) {
+        res.status(500).json({msg : err.message});
+      }
+};
+
+
+//new project 
+const newProject = async (req, res) => {
+    try{
+        const user_email = req.params.email;
+
+        const isvaliD = await User.findOne({ email: user_email });
+
+        if (!isvaliD) {
+            res.status(400).json({ msg: "Not Allowed" });
+        } else {
+            var today = new Date();
+            const d = new Date();
+
+            function addZero(i) {
+                if (i < 10) { i = "0" + i }
+                return i;
+            }
+
+            let h = addZero(d.getHours());
+            let m = addZero(d.getMinutes());
+            let s = addZero(d.getSeconds());
+            let time = h + ":" + m + ":" + s;
+            var date = today.getDate() + '-' + (today.getMonth() + 1) + '-' + today.getFullYear();
+            var full = (today.getMonth() + 1) + " " + today.getDate() + ", " + today.getFullYear() + " " + time;
+            let co_supervisor = "";
+            if (req.body.co_supervisor) {
+                co_supervisor = req.body.co_supervisor;
+            }
+
+            const newItem = await Project.create({
+                title: req.body.title,
+                brief_abstract: req.body.brief_abstract,
+                co_supervisor: co_supervisor,
+                specialization: req.body.specialization,
+                ownerDetails: isvaliD._id,
+                creation_date: date,
+                creation_time: time,
+                updation_date: "",
+                updation_time: "",
+                getfull: full,
+            });
+            await User.findByIdAndUpdate(isvaliD._id, { $push: { projects_posted: newItem._id } });
+            res.status(200).json({ msg: "Success" });
+        }
+    }
+    catch(err) {
+        res.status(500).json({msg : err.message});
+    }
+}
+
 
 
 //check student is alloted a project or not
@@ -36,10 +117,10 @@ const checkStudentAlloted = async (req, res) => {
         if (flag) res.status(200).json({ id: String(student[0].projectName) });
         else res.status(202).json({ msg: "not registered" });
     }
-    catch (err) {
-        res.status(500).json({ msg: err.message });
+    catch(err) {
+        res.status(500).json({msg : err.message});
     }
-
+    
 };
 
 
@@ -197,6 +278,24 @@ const getInterestedStudents = async (req, res) => {
 };
 
 
+const getProjectDetails = async (req, res) => {
+    try
+    {
+        const id = req.params.id;
+        const project = await Project.findById(id);
+
+        if (!project) {
+            res.status(404).json({ msg: "Not Found" });
+        } else {
+            res.status(200).json(project);
+        }
+    }
+    catch(err) {
+        res.status(500).json({msg : err.message});
+    }
+    
+};
+
 //find steps done by a student
 const findStepsDone = async (req, res) => {
     try {
@@ -297,6 +396,102 @@ const selectProject = async (req, res) => {
 
 
 
+const updateProjectDetails = async (req, res) => {
+    const project_id = req.params.id;
+    const isProject = await Project.findById(project_id);
+
+    if (!isProject) {
+        res.status(400).json({ "msg": "failure" });
+    } else {
+        const user = req.params.email;
+        const isUser = await User.findOne({ email: user });
+
+        if (!isUser) {
+            res.status(401).json({ msg: "User Not Exist" });
+        } else if (String(isProject.ownerDetails) !== String(isUser._id)) {
+            res.status(403).send("This Item Doesn't Belongs to You.");
+        } else {
+            let title = isProject.title;
+            let brief_abstract = isProject.brief_abstract;
+            let co_supervisor = "";
+            let specialization = isProject.specialization;
+
+            if (isProject.co_supervisor) {
+                co_supervisor = isProject.co_supervisor;
+            }
+
+            if (req.body.title) {
+                title = req.body.title;
+            }
+            if (req.body.brief_abstract) {
+                brief_abstract = req.body.brief_abstract;
+            }
+            if (req.body.co_supervisor) {
+                co_supervisor = req.body.co_supervisor;
+            }
+            if (req.body.specialization) {
+                specialization = req.body.specialization;
+            }
+
+            var today = new Date();
+            const d = new Date();
+
+            function addZero(i) {
+                if (i < 10) { i = "0" + i; }
+                return i;
+            }
+
+            let h = addZero(d.getHours());
+            let m = addZero(d.getMinutes());
+            let s = addZero(d.getSeconds());
+            let time = h + ":" + m + ":" + s;
+            var date = today.getDate() + '-' + (today.getMonth() + 1) + '-' + today.getFullYear();
+            var full = (today.getMonth() + 1) + " " + today.getDate() + ", " + today.getFullYear() + " " + time;
+
+            let updation_date = date;
+            let updation_time = time;
+
+            const updation_project = await Project.findByIdAndUpdate(isProject._id, {
+                title: title,
+                brief_abstract: brief_abstract,
+                co_supervisor: co_supervisor,
+                specialization: specialization,
+                updation_date: updation_date,
+                updation_time: updation_time,
+            });
+
+            res.status(200).json({ msg: "success" });
+        }
+    }
+}
+
+const deleteProject = async (req, res) => {
+    const user = await User.findOne({ email: req.params.email });
+    const pId = req.params.id;
+
+    const project = await Project.findById(pId);
+
+    if (!project) {
+        res.status(404).json({ msg: "Not Found" });
+    } else if (String(project.ownerDetails) !== String(user._id)) {
+        res.status(403).send("This Item Doesn't Belong to You.");
+    } else {
+        if (project.interestedPeople.length !== 0) {
+            const stud1 = await Student.find({ email: project.interestedPeople[0] });
+            const stud2 = await Student.findOne({ email: project.interestedPeople[1] });
+            await Student.findOneAndUpdate({ email: project.interestedPeople[0] }, { projectName: "000000000000000000000000", partner: "000000000000000000000000" });
+            await Student.findOneAndUpdate({ email: project.interestedPeople[1] }, { projectName: "000000000000000000000000", partner: "000000000000000000000000" });
+            await Project.findByIdAndUpdate(project._id, { $pull: { interestedPeople: stud1.email } });
+            await Project.findByIdAndUpdate(project._id, { $pull: { interestedPeople: stud2.email } });
+        }
+
+        await Project.findByIdAndDelete(pId);
+        await User.findByIdAndUpdate(user._id, { $pull: { projects_posted: project._id } });
+        res.status(200).json({ msg: "Success" });
+    }
+};
+
+
 //de select a project
 const deselectProject = async (req, res) => {
     const email = req.params.email;
@@ -324,6 +519,54 @@ const deselectProject = async (req, res) => {
         res.status(500).json({ msg: "Failure" });
     }
 };
+
+const downLoadDetails = async (req, res, next) => {
+    const workbook = new excelJS.Workbook();
+    const worksheet = workbook.addWorksheet("My Users");
+
+    const user = req.user.id;
+    const isValidUser = await User.findOne({ email: user });
+    var path = __dirname + `/public/student_data.xlsx`;
+
+    worksheet.columns = [
+        { header: "S no.", key: "s_no", width: 10 },
+        { header: "Project Name", key: "pname", width: 30 },
+        { header: "Student 1 Name", key: "name1", width: 20 },
+        { header: "Student 1 Roll", key: "roll1", width: 15 },
+        { header: "Student 1 ID", key: "id1", width: 20 },
+        { header: "Student 2 Name", key: "name2", width: 20 },
+        { header: "Student 2 Roll", key: "roll2", width: 15 },
+        { header: "Student 2 ID", key: "id2", width: 20 },
+    ];
+
+    let counter = 1;
+    if (isValidUser) var arrayOfProjects = isValidUser.projects_posted;
+    var details = await interestedPeople(arrayOfProjects);
+
+    if (details) {
+        details.forEach((entry) => {
+            worksheet.addRow({
+                s_no: counter,
+                pname: entry[0].project_name,
+                name1: entry[0][0] ? entry[0][0].name : "",
+                roll1: entry[0][0] ? entry[0][0].rollNum : "",
+                id1: entry[0][0] ? entry[0][0].email : "",
+                name2: entry[0][0] ? entry[1][0].name : "",
+                roll2: entry[0][0] ? entry[1][0].rollNum : "",
+                id2: entry[0][0] ? entry[1][0].email : "",
+            });
+            counter++;
+        });
+    }
+
+    worksheet.getRow(1).eachCell((cell) => {
+        cell.font = { bold: true };
+    });
+
+    const data = await workbook.xlsx.writeFile(path);
+    res.status(200).download(path);
+};
+
 export {
-    getAllProjects, checkStudentAlloted, newStudent, partner, finalpartner, partnerRequest, sentRequest, getOwnerDetails, getInterestedStudents, findStepsDone, IncreaseStepsDone, selectProject, deselectProject
+    getAllProjects, checkStudentAlloted, newStudent, getOwnerDetails, getInterestedStudents, findStepsDone, IncreaseStepsDone, selectProject, deselectProject, getOwnerProjects, newProject, getProjectDetails, downLoadDetails, updateProjectDetails, deleteProject
 }
