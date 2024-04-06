@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Routes} from 'react-router-dom';
 import AuthState from './context/auth/AuthState.js';
 import ItemState from './context/project/ProjectState.js';
 import StudentState from './context/student/StudentState.js';
+import ProfState from './context/prof/ProfState.js';
 
 //import pages
 import Interface from './Pages/interface.js';
@@ -17,46 +18,52 @@ import OwnerProjectPage from './Pages/prof/projects/ownerProjectPage.js';
 import ProfReadMore from './Pages/prof/projects/ownerReadMorePage.js';
 import AllReadMore from './Pages/prof/projects/allReadMorePage.js';
 import StudentFeedback from './Pages/student/others/feedback.js'
+import ProfFeedback from './Pages/prof/others/feedback.js'
 
 const App = () => {
   return (
     <AuthState>
         <ItemState>
             <StudentState>
-                <BrowserRouter>
-                    <Routes>
-                        {/* starting interface page */}
-                        <Route path='/' element={<Interface/>}/>
+                <ProfState>
+                      <BrowserRouter>
+                          <Routes>
+                              {/* starting interface page */}
+                              <Route path='/' element={<Interface/>}/>
 
-                        {/* prof login page */}
-                        <Route path='/btp/prof' element={<Proflogin/>}/>
+                              {/* prof login page */}
+                              <Route path='/btp/prof' element={<Proflogin/>}/>
 
-                        {/* prof home page */}
-                        <Route path='/btp/prof/owner/projects' element={<OwnerProjectPage/>}/>
+                              {/* prof home page */}
+                              <Route path='/btp/prof/owner/projects' element={<OwnerProjectPage/>}/>
 
-                        {/* All project page */}
-                        <Route path='/btp/prof/all/projects' element={<ProfallProjectPage/>}/>
+                              {/* All project page */}
+                              <Route path='/btp/prof/all/projects' element={<ProfallProjectPage/>}/>
 
-                        {/* prof particular project page */}
-                        <Route path='/btp/prof/onwer/projects/:id' element={<ProfReadMore/>}/>
+                              {/* prof particular project page */}
+                              <Route path='/btp/prof/owner/projects/:id' element={<ProfReadMore/>}/>
 
-                        {/* Allprojects particular project page */}
-                        <Route path='/btp/prof/all/projects/:id' element={<AllReadMore/>}/>
+                              {/* Allprojects particular project page */}
+                              <Route path='/btp/prof/all/projects/:id' element={<AllReadMore/>}/>
 
-                        
-                        {/* student login page */}
-                        <Route path='/btp/student' element={<Studentlogin/>}/>
+                              {/* prof feedback page */}
+                              <Route path='/btp/prof/feedback' element={<ProfFeedback/>}/>
 
-                        {/* student home page */}
-                        <Route path='/btp/student/projects' element={<StudentHome/>}/>
+                              
+                              {/* student login page */}
+                              <Route path='/btp/student' element={<Studentlogin/>}/>
 
-                        {/* student particular project page */}
-                        <Route path='/btp/student/projects/:id' element={<StudentSpecificProject/>}/>
+                              {/* student home page */}
+                              <Route path='/btp/student/projects' element={<StudentHome/>}/>
 
-                        {/* student feedback page */}
-                        <Route path='/btp/student/feedback' element={<StudentFeedback/>}/>
-                    </Routes>
-                </BrowserRouter>
+                              {/* student particular project page */}
+                              <Route path='/btp/student/projects/:id' element={<StudentSpecificProject/>}/>
+
+                              {/* student feedback page */}
+                              <Route path='/btp/student/feedback' element={<StudentFeedback/>}/>
+                          </Routes>
+                      </BrowserRouter>
+                  </ProfState>
               </StudentState>
         </ItemState>
           

@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 dotenv.config({ path: "config/.env" });
 
 import Student from "../Models/Student.js";
+import User from "../Models/User.js";
 
 
 async function sendFeedbackEmail(email, body, subject) {
@@ -43,11 +44,41 @@ async function sendFeedbackEmail(email, body, subject) {
     }
 }
 
+const createProf = async (req, res) => {
+    try{
+        const email = req.body.email;
+        const isExist = await User.findOne({ email: email });
+        // const isStud = await Student.findOne({ email: email });
+
+        if (isExist) {
+            res.status(201).json({msg:"Email Already Exisited "});
+        }
+        else {
+            await User.create({
+                name: req.body.name,
+                email: req.body.email
+            }
+            )
+
+            res.status(200).json({ msg: "User created success."})
+        }
+    }
+    catch (err) {
+        console.log("err = ", err);
+    }
+
+}
+
 const getallstudent = async (req, res) => {
-    const students = await Student.find();
-    res.status(200).json(students);
+    try{
+        const students = await Student.find();
+        res.status(200).json(students);
+    }
+    catch (err) {
+        console.log("err = ", err);
+    }
 }
 
 export {
-    sendFeedbackEmail, getallstudent
+    sendFeedbackEmail, getallstudent, createProf
 }

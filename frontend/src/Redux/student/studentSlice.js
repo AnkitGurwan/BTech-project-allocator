@@ -10,7 +10,7 @@ const initialState = {
 }
 
 const studentSlice = createSlice({
-    name:"student",
+    name: "student",
     initialState,
     reducers:{
         setStudentInfo(state,action){

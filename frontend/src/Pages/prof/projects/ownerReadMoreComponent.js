@@ -3,17 +3,100 @@ import { useParams,Link } from 'react-router-dom';
 import ProjectContext from '../../../context/project/ProjectContext';
 import Projectcardspecific from "./projectcardOwnerReadMore";
 import { useSelector } from 'react-redux';
+import AuthContext from "../../../context/auth/AuthContext";
+import ProfContext from "../../../context/prof/ProfContext";
 
 
 const Specificprojectcard=()=> {
-    const {Projectspecific,getInterestedStudents,allotProject,getSingleProject} = useContext(ProjectContext);
+    const {Projectspecific, getInterestedStudents, allotProject, getSingleProject} = useContext(ProjectContext);
+    const { ProfMicrosoftLogin } = useContext(AuthContext);
+    const { getProfDetailsFromMicrosoft, checkProfEligible, createProf } = useContext(ProfContext);
+
     const items = useSelector(state => state.allProjects.specificProjects);
+    
     const params=useParams();
-    const id=params.id;
+    const id = params.id;
+
     const [loading,setLoading]=useState(true);
+    const [allowed, setAllowed] = useState(false);
+    const [random, setRandom] = useState(false);
     const [alloted,setAlloted]=useState(false);
+
+
     var studentRegisteredList = useSelector(state => state.allProjects.interestedStudents);
     var newArray = [];
+
+    const profInfo = useSelector(state => state.prof.profInfo);
+
+
+  //check prof allowed or not to access the page
+  const checkAllowed = async () => {
+    const x = await getProfDetailsFromMicrosoft();
+    
+    if(x === 200)
+    {
+        if(profInfo && profInfo.profInfo)
+        {
+            var job = "student";
+            var roll = "340103016";
+
+            job = profInfo.profInfo.jobTitle;
+            roll = profInfo.profInfo.surname ? profInfo.profInfo.surname : "340103016";
+
+
+            if(checkProfEligible(job, roll))
+            {
+                setAllowed(true);
+                setLoading(false);
+            } 
+            else // not allowed
+            {
+                setAllowed(false);
+                setLoading(false);
+            }
+        }
+        else if(random) // not allowed
+        {
+            setAllowed(false);
+            setLoading(false);
+        }
+        setRandom(true);
+      } 
+      else //not logged in or token expired
+      {
+          //if user if not logged in, redirect user to login page
+          await ProfMicrosoftLogin();
+      }
+    };
+
+    const getItem = async () => {
+
+        checkAllowed();
+
+        const x = await getInterestedStudents(id);
+
+        const y = await getSingleProject(id);
+
+        if(y){
+          // console.log("y",y)
+          const isbanned = y.is_banned;
+          setAlloted(isbanned);
+        }
+
+        if(x === 200)setLoading(false);
+
+        //get a specific project
+        if (profInfo && profInfo.profInfo)
+        {
+            const x = await Projectspecific(profInfo.profInfo.mail);  
+        }
+    };
+
+
+    useEffect(() => {
+      getItem();
+    }, [random]);
+    
     for(let i=0;i<studentRegisteredList.length;i++)
     {
       let student1 = studentRegisteredList[i];
@@ -27,30 +110,7 @@ const Specificprojectcard=()=> {
     studentRegisteredList = newArray;
     // console.log("jj",newArray)
 
-    const getItem = async () => {        
-        await Projectspecific(); 
-        const x = await getInterestedStudents(id);
-        
-
-        const y = await getSingleProject(id);
-        // console.log("x",y)
-
-        if(y){
-          // console.log("y",y)
-          const isbanned = y.is_banned;
-          setAlloted(isbanned);
-        }
-        // alert("hiii")
-        // alert(is_banned)
-        // setAlloted(is_banned);
-
-        if(x === 200)setLoading(false);
-      };
-      // var is_banned = false;
-
-      useEffect(()=>{
-          getItem();
-      },[]);
+    
  
       
       const clickHandler = async (name1,name2) => {
@@ -66,16 +126,16 @@ const Specificprojectcard=()=> {
      return(
         <div className='my-2' style={{'fontFamily':'Manrope'}}>
           <div className="flex">
-            <Link className='text-xl md:text-3xl ml-4' to={`/owner`}><i class="fa-sharp fa-solid fa-arrow-left fa-lg"></i></Link>
+            <Link className='text-xl md:text-2xl ml-2' to={`/btp/prof/owner/projects`}><i class="fa-sharp fa-solid fa-arrow-left fa-lg"></i></Link>
           </div>
 
           <div className="flex flex-col md:flex-row mt-2">
-            <div className='w-full md:w-1/2 md:ml-16 md:mr-4 px-2'>
-              { items.filter((project) => project._id===id).map((projects,i) => { 
+            <div className='w-full md:w-1/2 md:ml-4 px-2'>
+              {items && items.length > 0 && items.filter((project) => project._id === id).map((projects,i) => { 
                 return (<Projectcardspecific key={i} project={projects}/>)})}
             </div>
 
-            <div className="md:w-1/2 flex flex-col items-center border-4 rounded-lg my-2 md:mx-8 p-2">
+            <div className="md:w-1/2 flex flex-col items-center border-4 rounded-lg my-2 md:mx-4 p-2">
                 <div>
                   <div className="font-medium text-center text-sm md:text-lg px-4 pb-2">Currently registered students :</div>
                   {
@@ -91,7 +151,8 @@ const Specificprojectcard=()=> {
                     :
                     <div className="py-2 grid mx-2 ">
                     
-                    { studentRegisteredList.length > 0 
+                    { 
+                    studentRegisteredList.length > 0 
                     ?
                     studentRegisteredList.map((individual) => {
                       return    (<div className="grid grid-cols-1 md:grid-cols-3 md:p-2 py-2 mb-4 bg-green-500 rounded-sm text-white">

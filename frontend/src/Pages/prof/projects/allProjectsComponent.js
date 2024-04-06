@@ -1,13 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ProjectContext from '../../../context/project/ProjectContext';
-import ProjectCard from './ownerProjectCard';
+import ProfContext from '../../../context/prof/ProfContext';
+import ProjectCard from './allProjectCard';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useSelector } from 'react-redux';
 
 const OwnerProjectsComponent = () => {
-  const { Projectspecific, createProject } = useContext(ProjectContext);
+  const { allProjects, createProject } = useContext( ProjectContext );
+  const { getProfDetailsFromMicrosoft } = useContext(ProfContext);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -16,10 +18,11 @@ const OwnerProjectsComponent = () => {
 
   const [count, setCount] = useState(0);
 
-  const items = useSelector(state => state.allProjects.specificProjects);
+  const items = useSelector((state) => state.allProjects.allProjects);
 
   const getItem = async () => {
-    const x = await Projectspecific();
+    const x = await allProjects();
+
     if (x === 200) setLoading(false);
     else {
       localStorage.clear('btpToken');
@@ -127,8 +130,9 @@ const OwnerProjectsComponent = () => {
                 </div>
               </div>
               <div class="absolute inset-y-0 right-0 hidden md:flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                <div
-                  class="text-gray-800 px-3 py-2 rounded-md text-xl font-bold"
+                <Link
+                  to={`/btp/prof/owner/projects`}
+                  class=" px-3 py-2 rounded-md text-xl "
                   style={{ textDecoration: 'none' }}
                 >
                   <i
@@ -136,15 +140,16 @@ const OwnerProjectsComponent = () => {
                     style={{ backgroundColor: 'transparent', paddingRight: '0.5rem' }}
                   ></i>
                   My Projects
-                </div>
-                <Link
-                  to={`/btp/prof/all/projects`}
-                  class="text-gray-700 hover:text-gray-500 px-3 py-2 no-underline rounded-md text-xl font-x-large"
+                </Link>
+                <div
+                  class="text-gray-800 px-3 py-2 no-underline rounded-md text-xl font-x-large font-bold"
                 >
                   All Projects
-                </Link>
+                </div>
               </div>
-              {mobileMenu ? (
+              {mobileMenu 
+              ?
+               (
                 <div className="flex md:hidden" onClick={() => setMobileMenu(false)}>
                   <div class="material-symbols-outlined text-black text-xl ml-12 mr-2">cancel</div>
                 </div>
@@ -155,24 +160,20 @@ const OwnerProjectsComponent = () => {
               )}
               {mobileMenu && (
                 <div className="flex flex-col md:hidden mt-12 z-10 border bg-white px-4 top-4 rounded-sm fixed left-8 cursor-pointer ">
-                  <div className="text-gray-700 font-bold no-underline py-2 text-lg border-b">My Projects</div>
                   <Link
-                    to={`/btp/prof/all/projects`}
-                    className="text-gray-600 hover:text-gray-700 text-lg py-2 border-b no-underline"
-                  >
-                    All projects
-                  </Link>
+                    to={`/btp/prof/owner/projects`} className="text-gray-700 no-underline py-2 text-lg border-b">
+                      My Projects
+                    </Link>
+                  
+                    <div className="text-gray-600 hover:text-gray-700 text-lg py-2 border-b no-underline font-bold ">
+                      All projects
+                    </div>
                 </div>
               )}
             </div>
           </div>
         </nav>
 
-        <div className="flex justify-end p-4">
-          <div id="myBtn" className="rounded-sm md:rounded-md bg-red-700 text-white font-medium cursor-pointer hover:bg-red-600" onClick={()=>{setShowModal(!showModal)}}>
-            <div className="p-2 text-lg md:text-xl">NEW PROJECT</div>
-          </div>
-        </div>
 
         {loading ? (
           <div class="flex items-center justify-center h-screen">
@@ -180,29 +181,7 @@ const OwnerProjectsComponent = () => {
           </div>
         ) : (
           <div>
-            <div
-              className="w-1/3 md:w-48  "
-              style={{ display: 'flex', marginLeft: '5vw', fontWeight: '600', position: 'absolute', top: '15vh' }}
-            >
-              <div
-                className="text-xs md:text-lg pr-2"
-                style={{ textAlign: 'center', fontWeight: '600' }}
-              >
-                Download List of Interested Students
-              </div>
-              <i
-                class="fa-solid fa-download text-2xl md:text-4xl"
-                onClick={download}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                }}
-              ></i>
-            </div>
-
-            <div className="grid grid-cols-2 my-12 mt-20 mx-1 px-2 md:grid-cols-3 lg:grid-cols-5">
+            <div className="grid grid-cols-2 gap-2 md:gap-4 pt-4 pb-2 px-2 md:px-6 md:grid-cols-3 lg:grid-cols-5">
               {items
                 .filter(projects => {
                   return search.toString().toLowerCase() === ''

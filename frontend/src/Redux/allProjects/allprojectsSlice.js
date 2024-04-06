@@ -30,10 +30,6 @@ const allprojectsSlice = createSlice({
                 interestedStudents : action.payload
               };
         }, 
-        addProject(state,action){
-            state.specificProjects.unshift(action.payload);
-            state.allProjects.unshift(action.payload);
-        }, 
         delProject(state,action){
             const index = state.specificProjects.findIndex(item => item.id === action.payload);
             state.specificProjects.slice(index, 1);

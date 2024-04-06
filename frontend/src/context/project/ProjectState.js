@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from 'react-redux';
-import { setSpecificProjects, setAllProjectsRedux, delProject, addProject, setInterestedStudents } from "../../Redux/allProjects/allprojectsSlice";
+import { setSpecificProjects, setAllProjectsRedux, delProject, setInterestedStudents } from "../../Redux/allProjects/allprojectsSlice";
 import ItemContext from "./ProjectContext";
 var _ = require('lodash');
 
@@ -42,39 +42,29 @@ const ItemState=(props)=>{
 
 
 
-    const Projectspecific = async () => {  
-        const response = await fetch(`${url}/project/specificProject`, {
+    const Projectspecific = async ( email ) => {  
+        const response = await fetch(`${url}/project/specificProject/${email}`, {
             method: 'GET',
             headers: {
-                'Content-Type': "application/json",
-                'auth-token': localStorage.getItem('prof_auth_token')
+                'Content-Type': "application/json"
             }
         })
 
-        const json = await (response.json())  
-
-        json.reverse();
-        if(json)
-        setItemsspecific(json);       
+        const json = await response.json();  
 
         dispatch(setSpecificProjects(json));
-        
         return response.status;
     };
 
-    const createProject = async (title,brief_abstract,co_supervisor,specialization) => {
-            const response = await fetch(`${url}/project/newproject`, {
+    const createProject = async (email, title, brief_abstract, co_supervisor, specialization) => {
+            const response = await fetch(`${url}/project/newProject/${email}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'auth-token':localStorage.getItem('prof_auth_token')
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ title,brief_abstract,co_supervisor,specialization})
+                body: JSON.stringify({ title, brief_abstract, co_supervisor, specialization})
             });
             
-            const json = await response.json(); 
-            const newItem={ title,brief_abstract,co_supervisor,specialization};
-            dispatch(addProject(newItem));
             return response.status;
     };
 
@@ -155,7 +145,7 @@ const ItemState=(props)=>{
             return response.status;
     };
 
-    const getInterestedStudents = async (id) => {    
+    const getInterestedStudents = async (id) => { 
             const response = await fetch(`${url}/project/getInterestedStudents/${id}`, {
                     method: 'GET',
                     headers: {

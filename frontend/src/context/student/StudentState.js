@@ -99,13 +99,6 @@ const StudentState = (props) => {
         const tenantID = process.env.MICROSOFT_GRAPH_TENANT_ID;
         const logoutEndpoint = `https://login.microsoftonline.com/${tenantID}/oauth2/v2.0/logout?post_logout_redirect_uri=${process.env.REACT_APP_FRONTEND_URL}`;
         window.location.href = logoutEndpoint;
-
-        // Delete the items from local storage
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('studId');
-        localStorage.removeItem('studJob');
-        localStorage.removeItem('studName');
-        localStorage.removeItem('studRoll');
     }
 
     const checkStudentEligible = ( roll ) => {
