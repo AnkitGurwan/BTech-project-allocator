@@ -80,7 +80,7 @@ const AuthState = (props) => {
 
     //dowload complete list of registered students
     const downloadDetails = async(email)=>{
-        const response = await fetch(`${url}/project/intrestedpeople/${email}`, {
+        const response = await fetch(`${url}/project/interestedpeople/${email}`, {
             method: 'GET',
             headers: {
                 'Content-Type': "application/json",

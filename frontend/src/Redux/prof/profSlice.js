@@ -3,12 +3,19 @@ var _ = require('lodash');
 
 const initialState = {
     ownerDetails:[],
+    profInfo: []
 }
 
 const ownerSlice = createSlice({
-    name:"owner",
+    name:"prof",
     initialState,
     reducers:{
+        setProfInfo(state,action){
+            return {
+                ...state,
+                profInfo: action.payload
+              };
+        }, 
         setOwner(state,action){
             return {
                 ...state,
@@ -25,7 +32,7 @@ const ownerSlice = createSlice({
         }, 
     }
 })
-export const {setOwner,addOwner,delOwner} = ownerSlice.actions;
+export const { setOwner, addOwner, delOwner, setProfInfo } = ownerSlice.actions;
 
 export default ownerSlice.reducer;
 

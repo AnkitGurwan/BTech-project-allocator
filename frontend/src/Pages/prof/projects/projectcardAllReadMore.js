@@ -1,27 +1,51 @@
-import React from 'react';
+import React,{useContext,useEffect,useState} from 'react';
+import { Link,useParams } from 'react-router-dom';
+import ProjectContext from '../../../context/project/ProjectContext';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useSelector } from 'react-redux';
 
-function ProjectCard(props) {
-  const { project } = props;
+const projectcardAllReadMore = ( props ) =>{
+    const { project } = props;
+    return(
+        <div className='w-full px-2' style={{'fontFamily':'Manrope'}}>
+          <div className="p-3 rounded-lg border-2 bg-gray-100">
+            <div className="py-1">
+                <div className="flex items-center justify-center font-Manrope tracking-tight leading-5 text-lg md:text-xl bg-gray-300 rounded-sm py-2 font-semibold md:font-bold">
+                  <i className="fa-solid fa-book text-xl px-2"></i>
+                  {project.title}
+                </div>
 
-  return (
-    <div className='projectcardmaindivv'>
-      <div className="px-2 rounded-lg border-4 bg-gray-100" style={{ width: "auto", height: "auto" }}>
-        <div className="card-body" style={{ display: "flex", flexDirection: "column", alignItems: "start", padding: "1rem" }}>
-          <h2 className="card-title pb-2"><i className="fa-solid fa-book text-lg" style={{ backgroundColor: "transparent", paddingRight: "0.5rem" }}></i>{project.title}</h2>
+                <div className="card-subtitle text-muted py-2 md:py-3">
+                  <div className='flex items-center'>
+                    <span className="material-symbols-outlined pr-1">
+                    person
+                    </span>
+                    <div className='text-xs md:text-sm'>{project.co_supervisor}</div>
+                  </div>
+                  <h6 className='text-xs md:text-sm'>(co-supervisor)</h6>
+                </div>
+                <hr/>
 
-          <h4 className="card-subtitle text-muted text-lg" style={{}}><i className="fa-solid fa-user text-lg" style={{ backgroundColor: "transparent", paddingRight: "0.5rem" }}></i>{project.co_supervisor}<h6 className='text-sm'>(co-supervisor)</h6></h4>
-          <hr className='w-full' />
-          <div className='text-start pl-1'>{project.brief_abstract}</div>
-          <hr className='w-full' />
-          <div className="card-text pb-2" style={{ display: "flex", flexDirection: "column", alignItems: "start" }}><h5 className='flex items-center mb-1'><span className="material-symbols-outlined pr-1">
-            school
-          </span><div className='text-lg m-0 p-0'>Specialisation</div></h5><div className='pl-2'>{project.specialization}</div></div>
-          <h6 className="card-title text-sm pb-1">Created on {project.creation_date} </h6>
-          <h6 className="card-title pb-0 text-sm">Created at {project.creation_time} </h6>
-        </div>
+                <div className="text-xs md:text-[1rem] leading-normal font-Manrope py-2 md:py-3 md:pl-1">{project.brief_abstract}</div>
+
+                <hr/>
+                
+                <div className="py-2 md:py-3">
+                  <div className='flex items-center pb-0 mb-0'>
+                    <span className="material-symbols-outlined pr-1">
+                    school
+                    </span>
+                    <div className='font-semibold text-xs md:text-lg '>
+                      Specialization
+                    </div>
+                  </div>
+                  <div className='text-xs md:text-sm pl-1'>{project.specialization}</div>
+                </div>
+              
+          </div>
       </div>
-    </div>
-  );
-}
+      </div>
+    )}
 
-export default ProjectCard;
+export default projectcardAllReadMore;

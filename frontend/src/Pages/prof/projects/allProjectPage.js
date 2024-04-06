@@ -1,6 +1,6 @@
 import React from 'react';
 import Allprojects from './allProjectsComponent.js';
-import Header from '../../../components/mainPagesHeader.js';
+import Header from '../../../components/mainPagesHeaderProf.js';
 
 const AllProjectPage = () => {
     return(
