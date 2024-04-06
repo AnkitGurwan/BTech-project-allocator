@@ -11,6 +11,7 @@ import Interface from './Pages/interface.js';
 import Proflogin from './Pages/prof/auth/profAuth.js';
 import Studentlogin from './Pages/student/auth/studentAuth.js';
 import StudentHome from './Pages/student/projects/allProjects.js';
+import StudentUpload from './Pages/student/others/upload.js';
 import PartnerHome from './Pages/student/others/partner.js';
 import StudentSpecificProject from './Pages/student/projects/specificProject.js';
 import ProfallProjectPage from './Pages/prof/projects/allProjectPage.js';
@@ -50,6 +51,9 @@ const App = () => {
 
                         {/* student home page */}
                         <Route path='/btp/student/projects' element={<StudentHome/>}/>
+
+                        {/* student documents page */}
+                        <Route path='/btp/student/upload' element={<StudentUpload/>}/>
 
                         {/* student particular project page */}
                         <Route path='/btp/student/projects/:id' element={<StudentSpecificProject/>}/>
