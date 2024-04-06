@@ -24,6 +24,7 @@ const ItemState=(props)=>{
     const allProjects = async () => {
         const response = await fetch(`${url}/project/allprojects`, {
             method: 'GET',
+            credentials:'include',
             headers: {
                 'Content-Type': "application/json"
             }
@@ -31,7 +32,10 @@ const ItemState=(props)=>{
         const json = await response.json();
 
         //reverse the array to get the latest project at top
-        json.reverse();
+        if(json.length > 0)
+        {
+            json.reverse();
+        }
 
         //save details in react state and redux
         setAllProjectsState(json);
@@ -45,6 +49,7 @@ const ItemState=(props)=>{
     const Projectspecific = async ( email ) => {  
         const response = await fetch(`${url}/project/specificProject/${email}`, {
             method: 'GET',
+            credentials:'include',
             headers: {
                 'Content-Type': "application/json"
             }
@@ -59,6 +64,7 @@ const ItemState=(props)=>{
     const createProject = async (email, title, brief_abstract, co_supervisor, specialization) => {
             const response = await fetch(`${url}/project/newProject/${email}`, {
                 method: 'POST',
+                credentials:'include',
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -72,6 +78,7 @@ const ItemState=(props)=>{
     const updateProject = async (title, brief_abstract, co_supervisor, specialization, id, email) => {
             const response = await fetch(`${url}/project/updateProject/${id}/${email}`, {
                 method: 'PATCH',
+                credentials:'include',
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -85,6 +92,7 @@ const ItemState=(props)=>{
     const deleteProject=async(id, email)=>{
             const response = await fetch(`${url}/project/deleteProject/${id}`, {
                 method: 'DELETE',
+                credentials:'include',
                 headers: {
                     'Content-Type': "application/json",
                     'auth-token':localStorage.getItem('prof_auth_token')
@@ -133,6 +141,7 @@ const ItemState=(props)=>{
     const getOwnerDetails = async( id )=>{          
             const response = await fetch(`${url}/project/ownerdetails/${id}`, {
                     method: 'GET',
+                    credentials:'include',
                     headers: {
                         'Content-Type': "application/json"
                     }
@@ -147,6 +156,7 @@ const ItemState=(props)=>{
     const getInterestedStudents = async (id) => { 
             const response = await fetch(`${url}/project/getInterestedStudents/${id}`, {
                     method: 'GET',
+                    credentials:'include',
                     headers: {
                         'Content-Type': "application/json"
                     }
@@ -162,6 +172,7 @@ const ItemState=(props)=>{
     const getSingleProject = async(id)=>{
         const response = await fetch(`${url}/project/projectSpecific/${id}`, {
             method: 'GET',
+            credentials:'include',
             headers: {
                 'Content-Type': "application/json"
             }

@@ -21,9 +21,13 @@ const SpecificProjectComponent = () => {
     const { checkStudentEligible } = useContext(StudentContext);
     const { getUserDetailsFromMicrosoft, StudentMicrosoftLogin } = useContext(AuthContext);
 
+    //redux information fetch
+    const studentRegisteredList = useSelector(state => state.allProjects.interestedStudents);
+    const items = useSelector(state => state.allProjects.allProjects);
+
     //define states
-    const [allowed,setAllowed] = useState(true);
-    const [loading,setLoading] = useState(true);
+    const [allowed,setAllowed] = useState(items.length > 0 ? true : false);
+    const [loading,setLoading] = useState(items.length > 0 ? true : false);
     const [random, setRandom] = useState(false);
     
     const params=useParams();
@@ -32,68 +36,39 @@ const SpecificProjectComponent = () => {
     const Store = [];  
     Store.push(details);
 
-    //redux information fetch
-    const studentRegisteredList = useSelector(state => state.allProjects.interestedStudents);
-    const items = useSelector(state => state.allProjects.allProjects);
-    const studentInfo = useSelector((state) => state.student.studentInfo);
-
-     //check student allowed or not to access the page
-     const checkStudentAllowed = async () => {
-        const x = await getUserDetailsFromMicrosoft();
-        
-        if(x === 200)
-        {
-            let surname = "";
-            if(studentInfo && studentInfo.studInfo && studentInfo.studInfo.jobTitle === "BTECH")
-            {
-                surname = studentInfo.studInfo.surname;
-                if(checkStudentEligible(surname))
-                {
-                    setAllowed(true);
-                    setLoading(false);
-                } 
-                else // not allowed
-                {
-                    setAllowed(false);
-                    setLoading(false);
-                }
-            }
-            else if(random) // not allowed
-            {
-                setAllowed(false);
-                setLoading(false);
-            }
-            setRandom(true);
-        } 
-        else //not logged in or token expired
-        {
-            //if user if not logged in, redirect user to login page
-            await StudentMicrosoftLogin();
-        }
-    };
-
-
     useEffect(() => {
-      //check the user is allowed to use the website
-      checkStudentAllowed();
-
-      getItem();
-      
+      if(items.length === 0)getItem();
   }, [random]);
 
     const getItem = async () => {
-        
-      checkStudentAllowed();
-      
-      //get all interested student in the project
-      const x = await getInterestedStudents(id);
+
+      await getUserDetailsFromMicrosoft();
 
       //get all projects
-      await allProjects();
+      const x = await allProjects();
+      if(x === 408)
+      {
+        await StudentMicrosoftLogin();
+      }
+      else if(x === 409 || x === 410)
+      {
+        setLoading(false); 
+        setAllowed(false);
+      }
+      else 
+      {
+          setLoading(false); 
+          setAllowed(true);
+      }
+
+      //get all interested student in the project
+      const y = await getInterestedStudents(id);
 
       await getOwnerDetails(id);
 
-      if(x === 200)setLoading(false);    
+      if(y === 200)setLoading(false);    
+
+      setRandom(true);
     }
 
     

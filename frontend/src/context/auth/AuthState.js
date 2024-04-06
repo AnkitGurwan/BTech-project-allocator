@@ -33,6 +33,7 @@ const AuthState = (props) => {
     const sendFeedback = async (email, header, body)=>{
         const response = await fetch(`${url}/btp/feedback`, {
             method: 'POST',
+            credentials:'include',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -46,6 +47,7 @@ const AuthState = (props) => {
     const ownerdetails = async (id) => {
         const response = await fetch(`${url}/project/ownerdetails/${id}`, {
             method: 'GET',
+            credentials:'include',
             headers: {
                 'Content-Type': "application/json",
                 'auth-token':localStorage.getItem('btpToken')
@@ -64,6 +66,7 @@ const AuthState = (props) => {
     const projectdetails = async (id) => {
         const response = await fetch(`${url}/project/projectdetails/${id}`, {
             method: 'GET',
+            credentials:'include',
             headers: {
                 'Content-Type': "application/json",
                 'auth-token': localStorage.getItem('btpToken')
@@ -82,6 +85,7 @@ const AuthState = (props) => {
     const downloadDetails = async(email)=>{
         const response = await fetch(`${url}/project/interestedpeople/${email}`, {
             method: 'GET',
+            credentials:'include',
             headers: {
                 'Content-Type': "application/json",
                 'Accept': 'application/json'
