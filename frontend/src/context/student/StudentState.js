@@ -40,6 +40,7 @@ const StudentState = (props) => {
     const createStudent = async (userEmail, userName, userRoll) => {
         const response = await fetch(`${url}/student/newstudent`, {
             method: 'POST',
+            credentials:'include',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -53,6 +54,7 @@ const StudentState = (props) => {
     const addPartner = async ( student, partner ) => {
         const response = await fetch(`${url}/student/partner/${student}/${partner}`, {
             method: 'GET',
+            credentials:'include',
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -65,6 +67,7 @@ const StudentState = (props) => {
     const finalPartner = async ( student, partner ) => {
         const response = await fetch(`${url}/student/finalpartner/${student}/${partner}`, {
             method: 'GET',
+            credentials:'include',
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -77,6 +80,7 @@ const StudentState = (props) => {
     const partnerRequest = async (email) => {
         const response = await fetch(`${url}/student/partnerrequest/${email}`, {
             method: 'GET',
+            credentials:'include',
             headers: {
                 'Content-Type': "application/json"
             }
@@ -93,6 +97,7 @@ const StudentState = (props) => {
     const sentRequest = async (email) => {
         const response = await fetch(`${url}/student/sentrequest/${email}`, {
             method: 'GET',
+            credentials:'include',
             headers: {
                 'Content-Type': "application/json"
             }
@@ -109,6 +114,7 @@ const StudentState = (props) => {
     const findStepDone = async ( email ) => {
         const response = await fetch(`${url}/student/stepsdone/find/${email}`,{
             method: 'GET',
+            credentials:'include',
             headers: { 
                 'Context-Type': 'application/json'
             }
@@ -120,6 +126,7 @@ const StudentState = (props) => {
     const increaseStepDone = async ( email ) => {
         const response = await fetch(`${url}/student/stepsdone/increase/${email}`,{
             method: 'GET',
+            credentials:'include',
             headers: { 
                 'Context-Type': 'application/json'
             }
@@ -131,10 +138,11 @@ const StudentState = (props) => {
 
     const getAllStudent = async ()=>{     
         const response = await fetch(`${url}/student/allstudents`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': "application/json"
-                }
+            method: 'GET',
+            credentials:'include',
+            headers: {
+                'Content-Type': "application/json"
+            }
             })   
         const json=await response.json()
         dispatch(setAllStudents(json));

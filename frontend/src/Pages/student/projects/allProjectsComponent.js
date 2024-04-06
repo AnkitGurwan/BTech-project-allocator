@@ -15,12 +15,17 @@ const AllProjectsComponent = () => {
     //context apis
     const { allProjects } = useContext(ProjectContext);
     const { getUserDetailsFromMicrosoft, StudentMicrosoftLogin } = useContext(AuthContext);
-    const { createStudent, checkStudentAlloted, findStepDone, LogOut, checkStudentEligible, getAllStudent } = useContext(StudentContext);
+    const { createStudent, checkStudentAlloted, findStepDone, LogOut, getAllStudent } = useContext(StudentContext);
     
+    //get details from redux store
+    const items = useSelector((state) => state.allProjects.allProjects);
+    const students = useSelector((state) => state.student.allStudents);
+    const studentInfo = useSelector((state) => state.student.studentInfo);
+
     //react states
     const [mobileMenu, setMobileMenu] = useState(false);
-    const [allowed, setAllowed] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [allowed, setAllowed] = useState(items.length > 0 ? true : false);
+    const [loading, setLoading] = useState(items.length > 0 ? false : true);
     const [registered, setRegistered] = useState(false);
     const [projectId,setProjectId] = useState('');
     const [partner, setPartner] = useState('');
@@ -30,12 +35,7 @@ const AllProjectsComponent = () => {
     const [allotedProjects, setAllotedProjects] = useState([]);
     const [unAllotedProjects, setUnAllotedProjects] = useState([]);
 
-
-    //get details from redux store
-    const items = useSelector((state) => state.allProjects.allProjects);
-    const students = useSelector((state) => state.student.allStudents);
-    const studentInfo = useSelector((state) => state.student.studentInfo);
-
+    
 
     const sortProjects = () => {
         if(items)
@@ -49,11 +49,26 @@ const AllProjectsComponent = () => {
     }
 
 
-
     const getItem = async () => {
-        
-        //get all items
-        await allProjects();
+
+        await getUserDetailsFromMicrosoft();
+
+       //get all projects
+        const x = await allProjects();
+        if(x === 408)
+        {
+            await StudentMicrosoftLogin();
+        }
+        else if(x === 409 || x === 410)
+        {
+            setLoading(false); 
+            setAllowed(false);
+        }
+        else 
+        {
+            setLoading(false); 
+            setAllowed(true);
+        }
 
         //register a new student
         if (studentInfo && studentInfo.studInfo)
@@ -69,42 +84,8 @@ const AllProjectsComponent = () => {
                 checkAllotedFunc();
             }
         }
-    };
 
-
-    //check student allowed or not to access the page
-    const checkStudentAllowed = async () => {
-        const x = await getUserDetailsFromMicrosoft();
-        
-        if(x === 200)
-        {
-            let surname = "";
-            if(studentInfo && studentInfo.studInfo && studentInfo.studInfo.jobTitle === "BTECH")
-            {
-                surname = studentInfo.studInfo.surname;
-                if(checkStudentEligible(surname))
-                {
-                    setAllowed(true);
-                    setLoading(false);
-                } 
-                else // not allowed
-                {
-                    setAllowed(false);
-                    setLoading(false);
-                }
-            }
-            else if(random) // not allowed
-            {
-                setAllowed(false);
-                setLoading(false);
-            }
-            setRandom(true);
-        } 
-        else //not logged in or token expired
-        {
-            //if user if not logged in, redirect user to login page
-            await StudentMicrosoftLogin();
-        }
+        setRandom(true);
     };
 
     const checkAllotedFunc = async () => {
@@ -122,9 +103,6 @@ const AllProjectsComponent = () => {
             else if(x === 401)
             {
                 await LogOut();
-                // toast.success('Session Expired, Please Login again', {
-                //     position: toast.POSITION.TOP_CENTER
-                // });
             }
         }
     }
@@ -132,21 +110,15 @@ const AllProjectsComponent = () => {
 
     useEffect(() => {
         
-        //check the user is allowed to use the website
-        checkStudentAllowed();
-
         //handler steps
         handlerNextWork();
 
         //handler sorting of projects
         sortProjects();
 
-        //get all students. Students will be stored in react redux store
-        getAllStudent();
-
         getPartner();
         
-        getItem();
+        if(items.length === 0)getItem();
     }, [random]);
 
     
@@ -364,7 +336,7 @@ const AllProjectsComponent = () => {
                         <div className='flex-col'>
                             <h1 className="light text-2xl md:text-3xl">Welcome,</h1>
                             <h1 className="font-medium py-1 text-2xl md:text-3xl">
-                                {studentInfo ? studentInfo.studInfo.givenName : ""}
+                                {studentInfo && studentInfo.studInfo ? studentInfo.studInfo.givenName : ""}
                             </h1>
                             <p className="text-sm md:text-lg">B.Tech. in Mechanical Engineering</p>
                         </div>

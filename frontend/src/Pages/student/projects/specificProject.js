@@ -1,6 +1,6 @@
 import React from 'react';
 import StudentProjects from './specificProjectComponent.js';
-import Header from '../../../components/mainPagesHeader';
+import Header from '../../../components/mainPagesHeader.js';
 
 const StudentSpecificProject = () => {
     return(

@@ -23,67 +23,53 @@ const OwnerProjectsComponent = () => {
   const items = useSelector(state => state.allProjects.specificProjects);
   const profInfo = useSelector(state => state.prof.profInfo);
 
-
-  //check prof allowed or not to access the page
-  const checkAllowed = async () => {
-    const x = await getProfDetailsFromMicrosoft();
-    
-    if(x === 200)
-    {
-        if(profInfo && profInfo.profInfo)
-        {
-            var job = "student";
-            var roll = "340103016";
-
-            job = profInfo.profInfo.jobTitle;
-            roll = profInfo.profInfo.surname ? profInfo.profInfo.surname : "340103016";
-
-
-            if(checkProfEligible(job, roll))
-            {
-                setAllowed(true);
-                setLoading(false);
-            } 
-            else // not allowed
-            {
-                setAllowed(false);
-                setLoading(false);
-            }
-        }
-        else if(random) // not allowed
-        {
-            setAllowed(false);
-            setLoading(false);
-        }
-        setRandom(true);
-    } 
-    else //not logged in or token expired
-    {
-        //if user if not logged in, redirect user to login page
-        await ProfMicrosoftLogin();
-    }
-  };
-
   const getItem = async () => {
 
-      checkAllowed();
+      const x = await getProfDetailsFromMicrosoft();
+
+      if(x === 408)
+      {
+          await ProfMicrosoftLogin();
+      }
+      else if(x === 409 || x === 410)
+      {
+          setLoading(false); 
+          setAllowed(false);
+      }
+      else 
+      {
+          setLoading(false); 
+          setAllowed(true);
+      }
 
       //register a new prof
       if (profInfo && profInfo.profInfo)
       {
-        if(checkProfEligible(profInfo.profInfo.mail, profInfo.profInfo.surname))
-        {
-          const x = await createProf(
+        const x = await createProf(
               profInfo.profInfo.mail,
               profInfo.profInfo.displayName
-          );
-        }      
+          );   
       }
 
       //get a specific project
       if (profInfo && profInfo.profInfo)
       {
           const x = await Projectspecific(profInfo.profInfo.mail);  
+
+          if(x === 408)
+          {
+              await ProfMicrosoftLogin();
+          }
+          else if(x === 409 || x === 410)
+          {
+              setLoading(false); 
+              setAllowed(false);
+          }
+          else 
+          {
+              setLoading(false); 
+              setAllowed(true);
+          }
       }
   };
 
@@ -174,12 +160,12 @@ const OwnerProjectsComponent = () => {
     }
   
   return (
-    <div class="w-full overflow-x-hidden">
-      <div class="w-full text-left">
-        <nav class="shadow-md">
-          <div class="mx-auto p-2">
-            <div class="flex items-center justify-between h-16">
-              <div class="flex items-center justify-start">
+    <div className="w-full overflow-x-hidden">
+      <div className="w-full text-left">
+        <nav className="shadow-md">
+          <div className="mx-auto p-2">
+            <div className="flex items-center justify-between h-16">
+              <div className="flex items-center justify-start">
                 <div className="flex items-center justify-start gap-2 px-2">
                     <i className="fas fa-search text-xl pr-2 h-full" />
                     <div className="form-outline">
@@ -195,31 +181,31 @@ const OwnerProjectsComponent = () => {
                     </div>
                 </div>
               </div>
-              <div class="absolute inset-y-0 right-0 hidden md:flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+              <div className="absolute inset-y-0 right-0 hidden md:flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                 <div
-                  class="text-gray-800 px-3 py-2 rounded-md text-xl font-bold"
+                  className="text-gray-800 px-3 py-2 rounded-md text-xl font-bold"
                   style={{ textDecoration: 'none' }}
                 >
                   <i
-                    class="fa-solid fa-user text-md"
+                    className="fa-solid fa-user text-md"
                     style={{ backgroundColor: 'transparent', paddingRight: '0.5rem' }}
                   ></i>
                   My Projects
                 </div>
                 <Link
                   to={`/btp/prof/all/projects`}
-                  class="text-gray-700 hover:text-gray-500 px-3 py-2 no-underline rounded-md text-xl font-x-large"
+                  className="text-gray-700 hover:text-gray-500 px-3 py-2 no-underline rounded-md text-xl font-x-large"
                 >
                   All Projects
                 </Link>
               </div>
               {mobileMenu ? (
                 <div className="flex md:hidden" onClick={() => setMobileMenu(false)}>
-                  <span class="material-symbols-outlined text-black text-xl ml-12 mr-2">cancel</span>
+                  <span className="material-symbols-outlined text-black text-xl ml-12 mr-2">cancel</span>
                 </div>
               ) : (
                 <div className="flex md:hidden" onClick={() => setMobileMenu(true)}>
-                  <span class="material-symbols-outlined text-black text-xl ml-12 mr-2">menu_open</span>
+                  <span className="material-symbols-outlined text-black text-xl ml-12 mr-2">menu_open</span>
                 </div>
               )}
               {mobileMenu && (
@@ -237,6 +223,8 @@ const OwnerProjectsComponent = () => {
           </div>
         </nav>
 
+        {allowed
+        ?
         <div className='flex justify-between items-center p-2 md:p-4'>
           <div
                 className="w-fit flex items-center border p-2 rounded-md"
@@ -248,7 +236,7 @@ const OwnerProjectsComponent = () => {
                   Download List
                 </div>
                 <i
-                  class="fa-solid fa-download text-2xl"
+                  className="fa-solid fa-download text-2xl"
                   onClick={download}
                   style={{
                     display: 'flex',
@@ -264,11 +252,13 @@ const OwnerProjectsComponent = () => {
                 </div>
               </div>
         </div>
+        :
+        ""}
         
 
         {loading ? (
-          <div class="flex items-center justify-center h-screen">
-            <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-gray-900"></div>
+          <div className="flex items-center justify-center h-screen">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-gray-900"></div>
           </div>
         ) : (
           <div>
@@ -334,7 +324,7 @@ const OwnerProjectsComponent = () => {
                         <h1 className="text-3xl font-bold mb-4">404</h1>
                         <p className="text-lg text-gray-700 mb-6">Oops! The page you're looking for could not be accessed by you.</p>
                         <div className="bg-blue-500 text-center text-white text-xl font-bold py-2 px-4 rounded">
-                            You are not part of this Course.
+                            You are not a professor at IITG.
                         </div>
                     </div>
                 </div>
@@ -355,16 +345,16 @@ const OwnerProjectsComponent = () => {
               >
                 <div className='cursor-pointer text-gray-600' onClick={() => {setShowModal(false)}}>&times;</div>
               </span>
-              <form class="w-full mx-auto px-4 md:px-8 mb-3" onSubmit={submit}>
-                <div class="mb-3">
-                  <label class="text-gray-600 font-bold mb-2 text-sm flex justify-start items-center" for="username">
-                    <span class="material-symbols-outlined pr-1">
+              <form className="w-full mx-auto px-4 md:px-8 mb-3" onSubmit={submit}>
+                <div className="mb-3">
+                  <label className="text-gray-600 font-bold mb-2 text-sm flex justify-start items-center" for="username">
+                    <span className="material-symbols-outlined pr-1">
                       bookmark
                     </span>
                     <div>Project Title</div>
                   </label>
                   <input
-                    class="appearance-none border rounded bg-gray-50 text-sm w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
+                    className="appearance-none border rounded bg-gray-50 text-sm w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
                     id="username"
                     type="text"
                     placeholder="Enter project title"
@@ -375,14 +365,14 @@ const OwnerProjectsComponent = () => {
                     required
                   />
                 </div>
-                <div class="mb-3">
-                  <label class="text-gray-600 font-bold mb-2 text-sm flex justify-start items-center" for="email">
+                <div className="mb-3">
+                  <label className="text-gray-600 font-bold mb-2 text-sm flex justify-start items-center" for="email">
                     Brief Abstract:
                   </label>
                   <textarea
                     id="message"
                     rows="5"
-                    class="block w-full text-sm text-gray-800 bg-gray-50 rounded-lg border border-gray-300 focus:outline-none focus:shadow-outline dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-500 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 px-3 py-2"
+                    className="block w-full text-sm text-gray-800 bg-gray-50 rounded-lg border border-gray-300 focus:outline-none focus:shadow-outline dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-500 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 px-3 py-2"
                     placeholder="Write project details..."
                     name="abstract"
                     onChange={onChangeHandler}
@@ -390,15 +380,15 @@ const OwnerProjectsComponent = () => {
                     required
                   ></textarea>
                 </div>
-                <div class="mb-3">
-                  <label class="text-gray-600 font-bold mb-2 text-sm flex justify-start items-center" for="confirm-password">
-                    <span class="material-symbols-outlined pr-1">
+                <div className="mb-3">
+                  <label className="text-gray-600 font-bold mb-2 text-sm flex justify-start items-center" for="confirm-password">
+                    <span className="material-symbols-outlined pr-1">
                       person
                     </span>
                     Co-Supervisor
                   </label>
                   <input
-                    class="appearance-none border text-sm rounded bg-gray-50 w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
+                    className="appearance-none border text-sm rounded bg-gray-50 w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
                     id="confirm-password"
                     type="text"
                     placeholder="Name of Co-Supervisor"
@@ -408,15 +398,15 @@ const OwnerProjectsComponent = () => {
                     required
                   />
                 </div>
-                <div class="mb-4">
-                  <label class="text-gray-600 font-bold mb-2 text-sm flex justify-start items-center" for="password">
-                    <span class="material-symbols-outlined pr-1">
+                <div className="mb-4">
+                  <label className="text-gray-600 font-bold mb-2 text-sm flex justify-start items-center" for="password">
+                    <span className="material-symbols-outlined pr-1">
                       school
                     </span>
                     Specialization:
                   </label>
                   <input
-                    class="appearance-none border text-sm rounded bg-gray-50 w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
+                    className="appearance-none border text-sm rounded bg-gray-50 w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
                     type="text"
                     placeholder="Enter the specialization"
                     name="specialization"
@@ -426,8 +416,8 @@ const OwnerProjectsComponent = () => {
                   />
                 </div>
 
-                <div class="flex items-center justify-center">
-                  <button class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-100" type="submit">
+                <div className="flex items-center justify-center">
+                  <button className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-100" type="submit">
                     Submit
                   </button>
                 </div>
