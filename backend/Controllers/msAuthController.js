@@ -104,7 +104,7 @@ export const getToken = async (req,res) => {
         res.cookie('btp_student_accessToken', accessToken, { httpOnly: true, secure: true });
 
         // Redirect to frontend page
-        res.redirect(`${process.env.FRONTENDURL}/btp/student/projects`);
+        res.redirect(`${process.env.FRONTENDURL}/btp/student/upload`);
       } 
       else {
         throw new Error(await response2.text());

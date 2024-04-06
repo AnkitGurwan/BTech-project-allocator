@@ -69,22 +69,21 @@ const ItemState=(props)=>{
     };
 
 
-    const updateProject = async (title,brief_abstract,co_supervisor,specialization,id) => {
-            const response = await fetch(`${url}/project/updateproject/${id}`, {
+    const updateProject = async (title, brief_abstract, co_supervisor, specialization, id, email) => {
+            const response = await fetch(`${url}/project/updateProject/${id}/${email}`, {
                 method: 'PATCH',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'auth-token':localStorage.getItem('prof_auth_token')
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ title,brief_abstract,co_supervisor,specialization})
+                body: JSON.stringify({ title, brief_abstract, co_supervisor, specialization})
             });
             
-            const json = await response.json();
+            return response.status;
     };
 
 
-    const deleteProject=async(id)=>{
-            const response = await fetch(`${url}/project/deleteproject/${id}`, {
+    const deleteProject=async(id, email)=>{
+            const response = await fetch(`${url}/project/deleteProject/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': "application/json",
