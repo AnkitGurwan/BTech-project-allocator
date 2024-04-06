@@ -7,6 +7,13 @@ import User from "../Models/User.js";
 
 import { sendEmail } from "./userController.js";
 
+import excelJS from "exceljs";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 //get all projects
 const getAllProjects = async (req, res) => {
     try {
@@ -466,15 +473,15 @@ const updateProjectDetails = async (req, res) => {
 }
 
 const deleteProject = async (req, res) => {
-    const user = await User.findOne({ email: req.params.email });
-    const pId = req.params.id;
+    
+    const pId = req.params.id
 
     const project = await Project.findById(pId);
 
+    const user = await User.findById(project.ownerDetails);
+    
     if (!project) {
         res.status(404).json({ msg: "Not Found" });
-    } else if (String(project.ownerDetails) !== String(user._id)) {
-        res.status(403).send("This Item Doesn't Belong to You.");
     } else {
         if (project.interestedPeople.length !== 0) {
             const stud1 = await Student.find({ email: project.interestedPeople[0] });
@@ -520,11 +527,34 @@ const deselectProject = async (req, res) => {
     }
 };
 
+
+const interestedPeople = async (arrayOfProjects) => {
+    var result = [];console.log(1)
+    console.log(arrayOfProjects)
+
+    if (arrayOfProjects) {
+        for (let i = 0; i < arrayOfProjects.length; i++) {
+            var student = [];
+            const project = await Project.findById(arrayOfProjects[i]);
+            if (project) {
+                for (let j = 0; j < 2; j++) {
+                    let people2 = await Student.find({ email: project.interestedPeople[j] });
+                    people2.project_name = project.title;
+
+                    student.push(people2);
+                }
+            }
+            result.push(student);
+        }
+    }
+    return result;
+}
+
 const downLoadDetails = async (req, res, next) => {
     const workbook = new excelJS.Workbook();
     const worksheet = workbook.addWorksheet("My Users");
 
-    const user = req.user.id;
+    const user = req.params.email;console.log(user)
     const isValidUser = await User.findOne({ email: user });
     var path = __dirname + `/public/student_data.xlsx`;
 
@@ -568,5 +598,6 @@ const downLoadDetails = async (req, res, next) => {
 };
 
 export {
-    getAllProjects, checkStudentAlloted, newStudent, getOwnerDetails, getInterestedStudents, findStepsDone, IncreaseStepsDone, selectProject, deselectProject, getOwnerProjects, newProject, getProjectDetails, downLoadDetails, updateProjectDetails, deleteProject
+    getAllProjects, checkStudentAlloted, newStudent, getOwnerDetails, getInterestedStudents, findStepsDone, IncreaseStepsDone, selectProject, deselectProject, getOwnerProjects, newProject, getProjectDetails, downLoadDetails, updateProjectDetails, deleteProject,
+    partner, partnerRequest, sentRequest, finalpartner
 }

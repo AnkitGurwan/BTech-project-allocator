@@ -8,9 +8,9 @@ import ProfContext from "../../../context/prof/ProfContext";
 
 
 const Specificprojectcard=()=> {
-    const {Projectspecific, getInterestedStudents, allotProject, getSingleProject} = useContext(ProjectContext);
+    const { Projectspecific, getInterestedStudents, allotProject, getSingleProject } = useContext(ProjectContext);
     const { ProfMicrosoftLogin } = useContext(AuthContext);
-    const { getProfDetailsFromMicrosoft, checkProfEligible, createProf } = useContext(ProfContext);
+    const { getProfDetailsFromMicrosoft, checkProfEligible } = useContext(ProfContext);
 
     const items = useSelector(state => state.allProjects.specificProjects);
     
