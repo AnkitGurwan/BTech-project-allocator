@@ -14,6 +14,7 @@ const projectSchema = new mongoose.Schema({
     updation_time: { type: String, required: false },
     gradeCardRequired:{ type: Boolean, default: false},
     resumeRequired:{ type: Boolean, default: false},
+    signedCopy: { type: String, default: "", required: false },
     is_banned: { type: Boolean, required: true, default: false }
 });
 

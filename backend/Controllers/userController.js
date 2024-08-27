@@ -31,7 +31,7 @@ async function sendEmail(email, body, subject) {
             from: 'ankitgurwan083@gmail.com',             // Sender Email
             to: email,                             // Email requested by user
             subject: subject,         // Subject Of The Mail
-            text: body,
+            html: body,
             //Custom Mail Message With the link to confirm email address (The link contain the user id and token corresponding)
         };
 
@@ -115,7 +115,7 @@ const createProf = async (req, res) => {
 }
 
 const getallstudent = async (req, res) => {
-    try{
+    try{console.log("stud")
         const students = await Student.find();
         res.status(200).json(students);
     }
