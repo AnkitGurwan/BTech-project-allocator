@@ -213,7 +213,7 @@ export const getInfo = async (req, res) => {
         },
       });
       
-      if (response.ok) {console.log(2)
+      if (response.ok) {
         const data = await response.json();
 
         res.status(200).json({ studInfo: data});

@@ -115,7 +115,7 @@ const createProf = async (req, res) => {
 }
 
 const getallstudent = async (req, res) => {
-    try{console.log("stud")
+    try{
         const students = await Student.find();
         res.status(200).json(students);
     }
