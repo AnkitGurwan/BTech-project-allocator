@@ -720,18 +720,15 @@ const checkDocuments = async (req, res) => {
         const email = req.params.email;
 
         const student = await Student.findOne({ email : email});
-        const project = await Project.findById(student.projectName);
 
-        if(student.gradeCardUrl !== "" && student.resumeUrl !== "" && project.signedCopy === "")
-        res.status(211).json({msg : "signed copy not uploaded"})
-        else if(student.gradeCardUrl !== "" && student.resumeUrl !== "")
-        res.status(200).json({msg : "resume upload success"})
+       if(student.gradeCardUrl !== "" && student.resumeUrl !== "")
+        res.status(200).json({msg : "Both uploaded"})
         else if(student.gradeCardUrl !== "")
-        res.status(201).json({msg : "resume upload success"})
+        res.status(201).json({msg : "Only resume uploaded"})
         else if(student.resumeUrl !== "")
-        res.status(202).json({msg : "resume upload success"})
+        res.status(202).json({msg : "Only cv uploaded"})
         else 
-        res.status(203).json({msg : "resume upload success"})
+        res.status(203).json({msg : "nothing uploaded"})
     }
     catch (err) {
         res.status(500).json({ msg: err.message });

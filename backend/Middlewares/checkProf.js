@@ -1,8 +1,8 @@
 async function checkProf(req, res, next) {
-    try {console.log(12);
+    try {
         // Retrieve cookie value
         const accessToken = req.cookies.btp_prof_accessToken;
-        console.log(accessToken);
+        
         if (!accessToken) {
             return res.status(408).json({ msg: 'Access token not found in cookie' });
         }
