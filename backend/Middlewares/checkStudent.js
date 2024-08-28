@@ -29,10 +29,11 @@ async function checkStudent(req, res, next) {
                 } else {
                     res.status(409).json({ msg: 'Surname out of range' });
                 }
-            } else {
-                res.status(410).json({ msg: 'Surname not found in user data' });
+            } else {console.log(22)
+                res.status(409).json({ msg: 'Surname not found in user data' });
             }
         } else {
+            console.log(33)
             res.status(410).json({ msg: 'User not registered' });
         }
     } catch (error) {

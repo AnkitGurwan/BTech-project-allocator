@@ -12,7 +12,7 @@ const AuthState = (props) => {
     const dispatch = useDispatch();
 
     //local backend url for testing
-    const url = 'http://localhost:5000';
+    const url = process.env.REACT_APP_BACKEND_URL;
 
     //hosted backend url
     // const url = process.env.REACT_APP_BACKEND_URL;

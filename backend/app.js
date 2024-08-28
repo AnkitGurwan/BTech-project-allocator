@@ -9,8 +9,8 @@ import cookieParser from 'cookie-parser';
 
 import cors from 'cors';
 const corsOptions = {
-    // origin: `${process.env.FRONTENDURL}`, 
-    origin: "http://localhost:3000",
+    origin: `${process.env.FRONTENDURL}`, 
+    // origin: "http://localhost:3000",
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
     credentials: true
   };
@@ -45,6 +45,6 @@ app.listen(process.env.PORT, (req, res, err) => {
         console.log(err);
     }
     else{
-        console.log("Server listening on PORT ",5000);
+        console.log(`Server listening on PORT : ${process.env.PORT}`);
     }
 })

@@ -4,6 +4,7 @@ dotenv.config({path:"config/.env"});
 import msal from '@azure/msal-node';
 import fetch from "node-fetch";
 import Student from "../Models/Student.js";
+import Project from "../Models/Project.js";
 
 const clientID = process.env.MICROSOFT_GRAPH_CLIENT_ID;
 const tenantID = process.env.MICROSOFT_GRAPH_TENANT_ID;
@@ -104,7 +105,25 @@ export const getToken = async (req,res) => {
         res.cookie('btp_student_accessToken', accessToken, { httpOnly: true, secure: true });
 
         // Redirect to frontend page
+        const email = data.mail;
+
+        const student = await Student.findOne({ email : email});
+
+        if(!student)
+        {
+          return res.redirect(`${process.env.FRONTENDURL}/btp/student/document/upload`);
+        }
+        
+        const project = await Project.findById(student.projectName);
+
+        if(student.gradeCardUrl !== "" && student.resumeUrl !== "" && project.signedCopy === "")
+        res.redirect(`${process.env.FRONTENDURL}/btp/student/document/upload`);
+
+        else if(student.gradeCardUrl === "")
         res.redirect(`${process.env.FRONTENDURL}/btp/student/upload`);
+
+        else
+        res.redirect(`${process.env.FRONTENDURL}/btp/student/projects`);
       } 
       else {
         throw new Error(await response2.text());
@@ -194,7 +213,7 @@ export const getInfo = async (req, res) => {
         },
       });
       
-      if (response.ok) {
+      if (response.ok) {console.log(2)
         const data = await response.json();
 
         res.status(200).json({ studInfo: data});
@@ -269,4 +288,3 @@ export const logOutProf = async (req, res) => {
   }
     
   };
-

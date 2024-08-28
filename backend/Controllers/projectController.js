@@ -96,6 +96,8 @@ const newProject = async (req, res) => {
                 updation_date: "",
                 updation_time: "",
                 getfull: full,
+                gradeCardRequired: req.body.gradeCardRequired,
+                resumeRequired: req.body.resumeRequired,
             });
             await User.findByIdAndUpdate(isvaliD._id, { $push: { projects_posted: newItem._id } });
             res.status(200).json({ msg: "Success" });
@@ -174,9 +176,18 @@ const partner = async (req, res) => {
             await Student.findOneAndUpdate({ email: partnerEmail }, { $addToSet : { receivedRequests : studentEmail} });
             
             const subject = `Received request for BTech Project (BTP-398)`;
-            const body = `\nYou have received a request from ${student.name} to collaborate for BTech Project.\n\n${process.env.FRONTENDURL}/btp/student \nLogin to the webiste and click on My Partner to see the request received.
-            `
+            const body = `
+            <div style="font-family: Arial, sans-serif; padding: 20px;">
+                <p style="font-size: 16px;">Hello,</p>
+                <p style="font-size: 16px;">You have received a request from ${student.name} to collaborate for BTech Project.</p>
+                <p style="font-size: 16px;">Please click the link below to view the request:</p>
+                <a href="${process.env.FRONTENDURL}/btp/student" style="display: inline-block; margin-top: 10px; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; font-size: 16px;">View Request</a>
+                <p style="font-size: 16px;">Login to the website and click on 'My Partner' to see the request received.</p>
+            </div>
+            `;
+
             sendEmail(partnerEmail, body, subject);
+
 
             res.status(200).json({ msg  : "sent successfully"});
         }
@@ -199,16 +210,36 @@ const finalpartner = async (req, res) => {
         else if (String(partner.partner) !== "000000000000000000000000") res.status(404).json({ msg: "partner has a partner" });
         else 
         {
-            await Student.findOneAndUpdate({ email: studentEmail }, { $set : { partner : partner._id} });
-            await Student.findOneAndUpdate({ email: partnerEmail }, { $set : { partner : student._id} });
+            await Student.findOneAndUpdate({ email: studentEmail }, { $set : { partner : partner._id} }, { $inc: { stepsDone: 1 } });
+            await Student.findOneAndUpdate({ email: partnerEmail }, { $set : { partner : student._id} }, { $inc: { stepsDone: 1 } });
 
             const subject = `Partner alloted for BTech Project (BTP-398)`;
-            const body = `\nYou and ${partner.name} are now partners for BTech Project.\n\n${process.env.FRONTENDURL}/btp/student \nLogin to the webiste and apply for the projects available.
-            `
+
+            const body = `
+            <div style="font-family: Arial, sans-serif; padding: 20px;">
+                <p style="font-size: 16px;">Hello,</p>
+                <p style="font-size: 16px;">You and ${partner.name} are now partners for BTech Project.</p>
+                <p style="font-size: 16px;">Please click the link below to view available projects and apply:</p>
+                <a href="${process.env.FRONTENDURL}/btp/student" style="display: inline-block; margin-top: 10px; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; font-size: 16px;">Apply for Projects</a>
+                <p style="font-size: 16px;">Login to the website and apply for the projects available.</p>
+            </div>
+            `;
+
             sendEmail(studentEmail, body, subject);
 
-            const body2 = `\nYou and ${student.name} are now partners for BTech Project.\n\n${process.env.FRONTENDURL}/btp/student \nLogin to the webiste and apply for the projects available.
-            `
+            const body2 = `
+            <div style="font-family: Arial, sans-serif; padding: 20px;">
+                <p style="font-size: 16px;">Hello,</p>
+                <p style="font-size: 16px;">You and ${student.name} are now partners for BTech Project.</p>
+                <p style="font-size: 16px;">Please click the link below to view available projects and apply:</p>
+                <a href="${process.env.FRONTENDURL}/btp/student" style="display: inline-block; margin-top: 10px; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; font-size: 16px;">Apply for Projects</a>
+                <p style="font-size: 16px;">Login to the website and apply for the projects available.</p>
+            </div>
+            `;
+
+sendEmail(partnerEmail, body, subject);
+
+
             sendEmail(partnerEmail, body2, subject);
 
             res.status(200).json({ msg  : "sent successfully"});
@@ -329,12 +360,17 @@ const IncreaseStepsDone = async (req, res) => {
             { $inc: { stepsDone: 1 } }, // Increment stepsDone by 1
             { new: true } // Return the updated document
         );
+        const partner = await Student.findByIdAndUpdate(
+            student.partner,
+            { $inc: { stepsDone: 1 } }, // Increment stepsDone by 1
+            { new: true } // Return the updated document
+        );
 
-        if (!student) {
+        if (!student || !partner) {
             return res.status(404).json({ error: 'Student not found' });
         }
 
-        res.status(200).json(student);
+        res.status(200).json({student, partner});
     }
     catch (err) {
         res.status(500).json({ msg: err.message });
@@ -350,6 +386,15 @@ const selectProject = async (req, res) => {
         const student = await Student.findOne({ email: email });
         const partnerId = student.partner;
 
+        const pId = req.params.id;
+        const project = await Project.findById(pId);
+
+
+        if(!student || (project.gradeCardRequired && student.gradeCardUrl === ""))
+        {
+            return res.status(406).json({msg : "Grade card not uploaded of user"})
+        }
+
         if (String(student.partner) === "000000000000000000000000") {
             res.status(401).json({ "msg": "Please Select A Partner" });
         }
@@ -357,37 +402,51 @@ const selectProject = async (req, res) => {
         else {
             const partner = await Student.findById(partnerId);
 
-            const pId = req.params.id;
-            const project = await Project.findById(pId);
+            if(!partner || (project.gradeCardRequired && partner.gradeCardUrl === ""))
+        {
+            return res.status(407).json({msg : "Grade card not uploaded of partner"})
+        }
 
             const owner = await User.findById(project.ownerDetails);
+            if(!owner)
+            {
+                return res.status(402).json({msg : "owner not found"})
+            }
             const ownerEmail = owner.email;
 
             if (project.interestedPeople.length !== 0) {
                 res.status(402).json({ msg: "Project Already Allotted." });
             }
             else {
-
                 if (student && String(student.projectName) !== "000000000000000000000000") {
                     res.status(403).json({ msg: "Project Already Allotted To You." });
                 }
-                else if (isValidUser) {
+                else if (partner) {
                     if (String(partner.projectName) !== "000000000000000000000000") {
                         res.status(404).json({ msg: "Project Already Allotted To Partner." });
                     }
                     else {
                         if (student && project && partner) {
-                            await Student.findByIdAndUpdate(student._id, { $push: { interestedLength: project._id } });
-                            await Student.findByIdAndUpdate(partner._id, { $push: { interestedLength: project._id } });
+                            await Student.findByIdAndUpdate(student._id, { $push: { interestedLength: project._id } }, { $inc: { stepsDone: 1 } } );
+                            await Student.findByIdAndUpdate(partner._id, { $push: { interestedLength: project._id } }, { $inc: { stepsDone: 1 } });
 
                             await Project.findByIdAndUpdate(project._id, { $push: { interestedPeople: student.email } });
                             await Project.findByIdAndUpdate(project._id, { $push: { interestedPeople: partner.email } });
                         }
 
                         const subject = `BTP-398`;
-                        const body = `\nUser with names : ${student.name} ${partner.name} has registered for the project : ${project.title.slice(0, 20)}.\n\n${process.env.FRONTENDURL}/login .\n\nKindly login to webiste and open the project and you can check user/group details.
-                        `
+                        const body = `
+                        <div style="font-family: Arial, sans-serif; padding: 20px;">
+                            <p style="font-size: 16px;">Hello,</p>
+                            <p style="font-size: 16px;">User with names: ${student.name} and ${partner.name} has registered for the project: ${project.title.slice(0, 20)}.</p>
+                            <p style="font-size: 16px;">Please click the link below to log in and view the project:</p>
+                            <a href="${process.env.FRONTENDURL}/login" style="display: inline-block; margin-top: 10px; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; font-size: 16px;">Login to Website</a>
+                            <p style="font-size: 16px;">Kindly login to the website and open the project to view user/group details.</p>
+                        </div>
+                        `;
+
                         sendEmail(ownerEmail, body, subject);
+
                         res.status(200).json({ msg: "Success" });
                     }
                 } else {
@@ -528,9 +587,74 @@ const deselectProject = async (req, res) => {
 };
 
 
+const allotProject = async (req, res) => {
+    const id = req.params.id;
+    await Project.findByIdAndUpdate(id, { interestedPeople: [] });
+    const project = await Project.findById(id);
+
+    const owner_id = String(project.ownerDetails);
+    const owner = await User.findById(owner_id);
+    const ownerEmail = owner.email;
+    const ownerName = owner.name;
+
+    const student1 = await Student.find({ email: req.params.student });
+    const student2 = await Student.find({ email: req.params.partner });
+
+    if (student1[0]) {
+        for (let i = 0; i < student1[0].interestedLength.length; i++) {
+            await Project.findByIdAndUpdate(student1[0].interestedLength[i], { $pull: { interestedPeople: student1[0].email } });
+        }
+    }
+
+    if (student2[0]) {
+        for (let i = 0; i < student2[0].interestedLength.length; i++) {
+            await Project.findByIdAndUpdate(student2[0].interestedLength[i], { $pull: { interestedPeople: student2[0].email } });
+        }
+    }
+
+    const addtostudu1 = await Student.findByIdAndUpdate(student1[0]._id, { projectName: project._id }, { $inc: { stepsDone: 1 } });
+    const addtostudu2 = await Student.findByIdAndUpdate(student2[0]._id, { projectName: project._id }, { $inc: { stepsDone: 1 } });
+    const addtointrestedpeople = await Project.findByIdAndUpdate(project._id, { $push: { interestedPeople: student1[0].email } });
+    const addtointrestedpeople2 = await Project.findByIdAndUpdate(project._id, { $push: { interestedPeople: student2[0].email } });
+    await Project.findByIdAndUpdate(project._id, { is_banned: true });
+
+    await Student.findByIdAndUpdate(student1[0]._id, { interestedLength: [] });
+    await Student.findByIdAndUpdate(student2[0]._id, { interestedLength: [] });
+
+    const subject = `BTP-398`;
+
+    // Email body for student 1
+    const body1 = `
+    <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <p style="font-size: 16px;">Dear ${student1[0].name},</p>
+        <p style="font-size: 16px;">${ownerName} (id: ${ownerEmail}) has approved your request to register for project ${project.title}.</p>
+        <p style="font-size: 16px;">Therefore, you are registered for the project and can't select any other project.</p>
+        <p style="font-size: 16px;">Your partner is ${student2[0].name} (id: ${student2[0].email}).</p>
+        <p style="font-size: 16px;">You can check the details on the website.</p>
+    </div>
+    `;
+
+    // Email body for student 2
+    const body2 = `
+    <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <p style="font-size: 16px;">Dear ${student2[0].name},</p>
+        <p style="font-size: 16px;">${ownerName} (id: ${ownerEmail}) has approved your request to register for project ${project.title}.</p>
+        <p style="font-size: 16px;">Therefore, you are registered for the project and can't select any other project.</p>
+        <p style="font-size: 16px;">Your partner is ${student1[0].name} (id: ${student1[0].email}).</p>
+        <p style="font-size: 16px;">You can check the details on the website.</p>
+    </div>
+    `;
+
+    // Send emails
+    sendEmail(student1[0].email, body1, subject);
+    sendEmail(student2[0].email, body2, subject);
+
+
+    res.status(200).json({ msg: "allotted" });
+};
+
 const interestedPeople = async (arrayOfProjects) => {
-    var result = [];console.log(1)
-    console.log(arrayOfProjects)
+    var result = [];
 
     if (arrayOfProjects) {
         for (let i = 0; i < arrayOfProjects.length; i++) {
@@ -550,11 +674,76 @@ const interestedPeople = async (arrayOfProjects) => {
     return result;
 }
 
+const uploadGradeCard = async (req, res) => {
+    try{
+        const url = req.body.url2;
+        const email = req.params.email;
+
+        const student = await Student.findOneAndUpdate({ email : email}, { gradeCardUrl : url }, { $inc: { stepsDone: 1 } } );
+        res.status(200).json({msg : "grade card upload success"})
+    }
+    catch (err) {
+        res.status(500).json({ msg: err.message });
+    }
+}
+
+const uploadResume = async (req, res) => {
+    try{
+        const url = req.body.url2;
+        const email = req.params.email;
+
+        const student = await Student.findOneAndUpdate({ email : email}, { resumeUrl : url });
+        res.status(200).json({msg : "resume upload success"})
+    }
+    catch (err) {
+        res.status(500).json({ msg: err.message });
+    }
+}
+
+const uploadSignedCopy = async (req, res) => {
+    try{
+        const url = req.body.url2;
+        const email = req.params.email;
+
+        const student = await Student.findOneAndUpdate({ email : email}, { $inc: { stepsDone: 1 } });
+        const partner = await Student.findOneAndUpdate(student.partner, { $inc: { stepsDone: 1 } });
+        const project = await Project.findByIdAndUpdate( student.projectName, { signedCopy : url });
+        res.status(200).json({msg : "resume upload success"})
+    }
+    catch (err) {
+        res.status(500).json({ msg: err.message });
+    }
+}
+
+const checkDocuments = async (req, res) => {
+    try{
+        const email = req.params.email;
+
+        const student = await Student.findOne({ email : email});
+        const project = await Project.findById(student.projectName);
+
+        if(student.gradeCardUrl !== "" && student.resumeUrl !== "" && project.signedCopy === "")
+        res.status(211).json({msg : "signed copy not uploaded"})
+        else if(student.gradeCardUrl !== "" && student.resumeUrl !== "")
+        res.status(200).json({msg : "resume upload success"})
+        else if(student.gradeCardUrl !== "")
+        res.status(201).json({msg : "resume upload success"})
+        else if(student.resumeUrl !== "")
+        res.status(202).json({msg : "resume upload success"})
+        else 
+        res.status(203).json({msg : "resume upload success"})
+    }
+    catch (err) {
+        res.status(500).json({ msg: err.message });
+    }
+}
+
+
 const downLoadDetails = async (req, res, next) => {
     const workbook = new excelJS.Workbook();
     const worksheet = workbook.addWorksheet("My Users");
 
-    const user = req.params.email;console.log(user)
+    const user = req.params.email;
     const isValidUser = await User.findOne({ email: user });
     var path = __dirname + `/public/student_data.xlsx`;
 
@@ -597,7 +786,60 @@ const downLoadDetails = async (req, res, next) => {
     res.status(200).download(path);
 };
 
+const downLoadAllStudentDetails = async (req, res, next) => {
+    const workbook = new excelJS.Workbook();
+    const worksheet = workbook.addWorksheet("My Users");
+
+    var path = __dirname + `/public/student_data.xlsx`;
+
+    worksheet.columns = [
+        { header: "S no.", key: "s_no", width: 10 },
+        { header: "Project Name", key: "pname", width: 30 },
+        { header: "Student 1 Name", key: "name1", width: 20 },
+        { header: "Student 1 Roll", key: "roll1", width: 15 },
+        { header: "Student 1 ID", key: "id1", width: 20 },
+        { header: "Student 2 Name", key: "name2", width: 20 },
+        { header: "Student 2 Roll", key: "roll2", width: 15 },
+        { header: "Student 2 ID", key: "id2", width: 20 },
+    ];
+
+    let counter = 1;
+    
+    const arrayOfProjects = await Project.find();
+    const arrayOfId = []; 
+
+    for(let i=0; i < arrayOfProjects.length; i++)
+    {
+        arrayOfId.push(arrayOfProjects[i]._id);
+    }
+    
+    var details = await interestedPeople(arrayOfProjects);
+
+    if (details) {
+        details.forEach((entry) => {
+            worksheet.addRow({
+                s_no: counter,
+                pname: entry[0].project_name,
+                name1: entry[0][0] ? entry[0][0].name : "",
+                roll1: entry[0][0] ? entry[0][0].rollNum : "",
+                id1: entry[0][0] ? entry[0][0].email : "",
+                name2: entry[0][0] ? entry[1][0].name : "",
+                roll2: entry[0][0] ? entry[1][0].rollNum : "",
+                id2: entry[0][0] ? entry[1][0].email : "",
+            });
+            counter++;
+        });
+    }
+
+    worksheet.getRow(1).eachCell((cell) => {
+        cell.font = { bold: true };
+    });
+
+    const data = await workbook.xlsx.writeFile(path);
+    res.status(200).download(path);
+};
+
 export {
     getAllProjects, checkStudentAlloted, newStudent, getOwnerDetails, getInterestedStudents, findStepsDone, IncreaseStepsDone, selectProject, deselectProject, getOwnerProjects, newProject, getProjectDetails, downLoadDetails, updateProjectDetails, deleteProject,
-    partner, partnerRequest, sentRequest, finalpartner
+    partner, partnerRequest, sentRequest, finalpartner, uploadGradeCard, uploadResume, checkDocuments, allotProject, downLoadAllStudentDetails, uploadSignedCopy
 }
