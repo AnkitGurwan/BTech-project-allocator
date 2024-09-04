@@ -8,12 +8,13 @@ import cookieParser from 'cookie-parser';
 
 
 import cors from 'cors';
+
 const corsOptions = {
-    origin: `${process.env.FRONTENDURL}`, 
-    // origin: "http://localhost:3000",
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
-    credentials: true
-  };
+  origin: process.env.FRONTENDURL,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
+  credentials: true,
+};
+
 app.use(cors(corsOptions)); 
 
 

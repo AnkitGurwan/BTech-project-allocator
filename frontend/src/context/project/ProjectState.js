@@ -15,10 +15,10 @@ const ItemState=(props)=>{
     const dispatch = useDispatch();
 
     //local backend url for testing
-    const url = 'http://localhost:5001';
+    // const url = 'http://localhost:5001';
 
     //hosted backend url
-    // const url = process.env.REACT_APP_BACKEND_URL;
+    const url = process.env.REACT_APP_BACKEND_URL;
 
     
     const allProjectsStudent = async () => {
@@ -84,7 +84,8 @@ const ItemState=(props)=>{
         return response.status;
     };
 
-    const createProject = async (email, title, brief_abstract, co_supervisor, specialization, gradeCardRequired, resumeRequired) => {
+    const createProject = async (email, title, brief_abstract, co_supervisor, specialization, date, time, is_banned, gradeCardRequired, resumeRequired) => {
+
             const response = await fetch(`${url}/project/newProject/${email}`, {
                 method: 'POST',
                 credentials:'include',

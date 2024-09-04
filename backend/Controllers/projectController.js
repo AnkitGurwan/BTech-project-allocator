@@ -545,8 +545,8 @@ const deleteProject = async (req, res) => {
         if (project.interestedPeople.length !== 0) {
             const stud1 = await Student.find({ email: project.interestedPeople[0] });
             const stud2 = await Student.findOne({ email: project.interestedPeople[1] });
-            await Student.findOneAndUpdate({ email: project.interestedPeople[0] }, { projectName: "000000000000000000000000", partner: "000000000000000000000000" });
-            await Student.findOneAndUpdate({ email: project.interestedPeople[1] }, { projectName: "000000000000000000000000", partner: "000000000000000000000000" });
+            await Student.findOneAndUpdate({ email: project.interestedPeople[0] }, { projectName: "000000000000000000000000"});
+            await Student.findOneAndUpdate({ email: project.interestedPeople[1] }, { projectName: "000000000000000000000000"});
             await Project.findByIdAndUpdate(project._id, { $pull: { interestedPeople: stud1.email } });
             await Project.findByIdAndUpdate(project._id, { $pull: { interestedPeople: stud2.email } });
         }

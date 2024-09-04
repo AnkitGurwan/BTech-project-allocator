@@ -1,6 +1,5 @@
 async function checkStudent(req, res, next) {
     try {
-        // Retrieve cookie value
         const accessToken = req.cookies.btp_student_accessToken;
 
         if (!accessToken) {

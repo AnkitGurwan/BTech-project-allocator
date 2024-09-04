@@ -102,7 +102,7 @@ export const getToken = async (req,res) => {
         const data = await response2.json();
         
         // Set access token as an HTTP cookie
-        res.cookie('btp_student_accessToken', accessToken, { httpOnly: true, secure: true });
+        res.cookie('btp_student_accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'None', });
 
         // Redirect to frontend page
         const email = data.mail;
@@ -113,10 +113,8 @@ export const getToken = async (req,res) => {
         {
           return res.redirect(`${process.env.FRONTENDURL}/btp/student/document/upload`);
         }
-        
-        const project = await Project.findById(student.projectName);
 
-        if(student.gradeCardUrl !== "" && student.resumeUrl !== "" && project.signedCopy === "")
+        if(student.gradeCardUrl !== "" && student.resumeUrl !== "")
         res.redirect(`${process.env.FRONTENDURL}/btp/student/document/upload`);
 
         else if(student.gradeCardUrl === "")
@@ -181,7 +179,7 @@ export const getToken2 = async (req,res) => {
         const data = await response2.json();
         
         // Set access token as an HTTP cookie
-        res.cookie('btp_prof_accessToken', accessToken, { httpOnly: true, secure: true });
+        res.cookie('btp_prof_accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'None', });
 
         // Redirect to frontend page
         res.redirect(`${process.env.FRONTENDURL}/btp/prof/owner/projects`);
@@ -262,7 +260,7 @@ export const logOut = async (req, res) => {
   try{
 
     // Clear the cookie named 'btp_student_accessToken'
-    res.clearCookie('btp_student_accessToken', { httpOnly: true, secure: true });
+    res.clearCookie('btp_student_accessToken', { httpOnly: true, secure: true, sameSite: 'None', });
     
     // Redirect the user to the login page or any other appropriate route
     res.status(201).json({ msg : "Logged out successfully"});
@@ -278,7 +276,7 @@ export const logOutProf = async (req, res) => {
   try{
 
     // Clear the cookie named 'btp_student_accessToken'
-    res.clearCookie('btp_prof_accessToken', { httpOnly: true, secure: true });
+    res.clearCookie('btp_prof_accessToken', { httpOnly: true, secure: true, sameSite: 'None', });
     
     // Redirect the user to the login page or any other appropriate route
     res.status(201).json({ msg : "Logged out successfully"});
